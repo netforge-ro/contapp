@@ -8,8 +8,8 @@ if [ \! -d ".git" ]; then
     exit 1
 fi
 
-# Create a filter-branch command that rewrites commit messages
-git filter-branch --force --msg-filter "sed -e 's/🤖 Generated with \[Claude Code\](https:\/\/claude.ai\/code)//g' -e 's/Generated with \[Claude Code\](https:\/\/claude.ai\/code)//g' -e 's/Co-Authored-By: Claude <noreply@anthropic.com>//g'" -- HEAD~10..HEAD
+# Create a filter-branch command that rewrites commit messages for all commits
+git filter-branch --force --msg-filter "sed -e 's/🤖 Generated with \[Claude Code\](https:\/\/claude.ai\/code)//g' -e 's/Generated with \[Claude Code\](https:\/\/claude.ai\/code)//g' -e 's/Co-Authored-By: Claude <noreply@anthropic.com>//g'" -- --all
 
 echo "Git history has been rewritten to remove references to Claude"
 echo "Note: You will need to force push to your remote repository with:"
