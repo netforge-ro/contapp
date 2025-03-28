@@ -13,8 +13,8 @@ def index():
 @bp.route('/adauga', methods=['GET', 'POST'])
 def adauga():
     if request.method == 'POST':
-        # Get the form data
-        serie = request.form.get('serie')
+        # Get the form data - always using the fixed series NET
+        serie = "NET"
         # Auto-increment the invoice number
         ultima_factura = Factura.query.filter_by(serie=serie).order_by(Factura.numar.desc()).first()
         if ultima_factura:
@@ -99,7 +99,7 @@ def adauga():
     produse = Produs.query.filter_by(activ=True).all()
     
     # Get the next invoice number for the default serie
-    serie_default = "FAC"
+    serie_default = "NET"
     ultima_factura = Factura.query.filter_by(serie=serie_default).order_by(Factura.numar.desc()).first()
     if ultima_factura:
         next_numar = ultima_factura.numar + 1
