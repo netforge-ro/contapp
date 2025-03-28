@@ -5,9 +5,9 @@ sudo pkill -f "gunicorn.*contapp.*wsgi:application"
 cd /var/www-tools/contapp && sudo -u nobody ./scripts/check_running.sh
 ```
 
-ContApp este o aplicație web modernă pentru gestionarea facturării, furnizorilor, stocurilor, clienților și rapoartelor financiare, dezvoltată integral în limba română pentru mediul universitar.
+ContApp este o aplicație web pentru gestionarea facturării, furnizorilor, stocurilor, clienților și rapoartelor financiare, dezvoltată integral în limba română pentru mediul universitar.
 
-![ContApp Dashboard](https://raw.githubusercontent.com/username/contapp/main/screenshots/dashboard.png)
+![ContApp Dashboard](https://raw.githubusercontent.com/netforge/contapp/main/screenshots/dashboard.png)
 
 ## Funcționalități principale
 
