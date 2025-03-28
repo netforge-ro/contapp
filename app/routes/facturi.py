@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from app.models import Factura, DetaliiFactura, Client, Produs
+from app.models import Factura, DetaliiFactura, Client, Produs, MiscareStoc
 from app import db
 from datetime import datetime, timedelta
 
@@ -13,13 +13,100 @@ def index():
 @bp.route('/adauga', methods=['GET', 'POST'])
 def adauga():
     if request.method == 'POST':
-        # Process form data here
-        pass
+        # Get the form data
+        serie = request.form.get('serie')
+        # Auto-increment the invoice number
+        ultima_factura = Factura.query.filter_by(serie=serie).order_by(Factura.numar.desc()).first()
+        if ultima_factura:
+            numar = ultima_factura.numar + 1
+        else:
+            numar = 1
+            
+        data_emitere = datetime.strptime(request.form.get('data_emitere'), '%Y-%m-%d')
+        data_scadenta = datetime.strptime(request.form.get('data_scadenta'), '%Y-%m-%d')
+        client_id = request.form.get('client_id')
+        metoda_plata = request.form.get('metoda_plata')
+        observatii = request.form.get('observatii')
+        achitata = True if request.form.get('achitata') else False
+        
+        # Create the invoice
+        factura = Factura(
+            serie=serie,
+            numar=numar,
+            data_emitere=data_emitere,
+            data_scadenta=data_scadenta,
+            client_id=client_id,
+            metoda_plata=metoda_plata,
+            observatii=observatii,
+            achitata=achitata,
+            valoare_totala=float(request.form.get('valoare_totala')),
+            valoare_tva=float(request.form.get('valoare_tva'))
+        )
+        
+        db.session.add(factura)
+        db.session.commit()
+        
+        # Get product information
+        produse_ids = request.form.getlist('produse[]')
+        cantitati = request.form.getlist('cantitati[]')
+        preturi = request.form.getlist('preturi[]')
+        tvs = request.form.getlist('tva[]')
+        valori = request.form.getlist('valori[]')
+        
+        # Add invoice details
+        for i in range(len(produse_ids)):
+            if produse_ids[i] and int(produse_ids[i]) > 0:
+                produs_id = int(produse_ids[i])
+                cantitate = int(cantitati[i])
+                pret_unitar = float(preturi[i])
+                tva_procent = int(tvs[i])
+                valoare = float(valori[i])
+                valoare_tva = valoare * tva_procent / 100
+                
+                detaliu = DetaliiFactura(
+                    factura_id=factura.id,
+                    produs_id=produs_id,
+                    cantitate=cantitate,
+                    pret_unitar=pret_unitar,
+                    tva=tva_procent,
+                    valoare=valoare,
+                    valoare_tva=valoare_tva
+                )
+                db.session.add(detaliu)
+                
+                # Update stock
+                miscare_stoc = MiscareStoc(
+                    produs_id=produs_id,
+                    cantitate=-cantitate,
+                    tip='iesire',
+                    data=datetime.now(),
+                    factura_id=factura.id,
+                    motiv=f"Vânzare factură {serie}{numar}"
+                )
+                db.session.add(miscare_stoc)
+                
+                # Update product stock
+                produs = Produs.query.get(produs_id)
+                produs.stoc -= cantitate
+                
+                db.session.add(produs)
+        
+        db.session.commit()
+        flash('Factura a fost adăugată cu succes!', 'success')
+        return redirect(url_for('facturi.index'))
     
     clienti = Client.query.filter_by(activ=True).all()
     produse = Produs.query.filter_by(activ=True).all()
     
-    return render_template('facturi/adauga.html', clienti=clienti, produse=produse)
+    # Get the next invoice number for the default serie
+    serie_default = "FAC"
+    ultima_factura = Factura.query.filter_by(serie=serie_default).order_by(Factura.numar.desc()).first()
+    if ultima_factura:
+        next_numar = ultima_factura.numar + 1
+    else:
+        next_numar = 1
+    
+    return render_template('facturi/adauga.html', clienti=clienti, produse=produse, next_numar=next_numar)
 
 @bp.route('/<int:id>')
 def vezi(id):

@@ -25,7 +25,8 @@
                         </div>
                         <div class="col-md-8">
                             <label for="numar" class="form-label">Număr</label>
-                            <input type="number" class="form-control" id="numar" name="numar" required min="1">
+                            <input type="number" class="form-control" id="numar" name="numar" required min="1" value="{{ next_numar }}" readonly>
+                            <small class="text-muted">Numărul facturii este autogenerat</small>
                         </div>
                     </div>
                     
