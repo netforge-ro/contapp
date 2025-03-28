@@ -173,6 +173,23 @@ Pentru întrebări sau sugestii legate de acest proiect, vă rugăm să contacta
 
 - GitHub: https://github.com/YOUR_USERNAME/contapp
 
+## Pregătirea pentru GitHub
+
+Înainte de a face acest repository public, asigurați-vă că:
+
+1. Ați eliminat toate datele sensibile (parole, chei API, etc.)
+2. Ați rulat scriptul `clean_history.sh` pentru a curăța istoricul git
+3. Ați verificat că nu există informații personale în cod
+
+```bash
+# Rulați acest script pentru a curăța istoricul git (din directorul rădăcină)
+./clean_history.sh
+# Verificați că istoricul a fost curățat
+git log --oneline
+# Forțați push-ul schimbărilor
+git push origin main --force
+```
+
 ## Licență
 
 Acest proiect este destinat exclusiv pentru utilizare educațională în mediul universitar. Toate drepturile sunt rezervate.
