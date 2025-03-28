@@ -7,7 +7,7 @@ cd /var/www-tools/contapp && sudo -u nobody ./scripts/check_running.sh
 
 ContApp este o aplicație web pentru gestionarea facturării, furnizorilor, stocurilor, clienților și rapoartelor financiare, dezvoltată integral în limba română pentru mediul universitar.
 
-![ContApp Dashboard](https://raw.githubusercontent.com/netforge/contapp/main/screenshots/dashboard.png)
+![ContApp Dashboard](screenshots/dashboard.png)
 
 ## Funcționalități principale
 
@@ -47,7 +47,7 @@ ContApp este o aplicație web pentru gestionarea facturării, furnizorilor, stoc
 
 ```bash
 # Crearea utilizatorului PostgreSQL
-sudo -u postgres psql -c "CREATE USER contapp_user WITH PASSWORD 'Conta2025App';"
+sudo -u postgres psql -c "CREATE USER contapp_user WITH PASSWORD 'YOUR_PASSWORD_HERE';"
 
 # Crearea bazei de date
 sudo -u postgres psql -c "CREATE DATABASE contapp WITH OWNER contapp_user;"
@@ -60,7 +60,7 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE contapp TO contapp_us
 
 ```bash
 # Clonare repository
-git clone https://github.com/username/contapp.git /var/www-tools/contapp
+git clone https://github.com/YOUR_USERNAME/contapp.git /var/www-tools/contapp
 
 # Creare mediu virtual Python
 cd /var/www-tools/contapp
@@ -171,8 +171,7 @@ python manage.py add_sample_data
 
 Pentru întrebări sau sugestii legate de acest proiect, vă rugăm să contactați:
 
-- Email: contact@example.com
-- GitHub: https://github.com/username/contapp
+- GitHub: https://github.com/YOUR_USERNAME/contapp
 
 ## Licență
 

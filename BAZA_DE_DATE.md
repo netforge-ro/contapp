@@ -196,9 +196,9 @@ pgAdmin este o platformă de administrare și dezvoltare open-source pentru Post
 
 ### Conectarea la Baza de Date
 
-1. **Accesați pgAdmin**: Deschideți pgAdmin în browser la adresa https://pgadmin.netforge.ro/
+1. **Accesați pgAdmin**: Deschideți pgAdmin în browser la adresa configurată
 
-2. **Autentificați-vă**: Folosiți credențialele furnizate (de obicei, email: admin@example.com și parola: ChangeMe123 dacă nu au fost modificate).
+2. **Autentificați-vă**: Folosiți credențialele furnizate de administratorul pgAdmin.
 
 3. **Creați o Conexiune Nouă la Server**:
    - În panoul din stânga, faceți clic dreapta pe "Servers" și selectați "Create" > "Server...".
@@ -208,7 +208,7 @@ pgAdmin este o platformă de administrare și dezvoltare open-source pentru Post
      - Port: 5432 (portul implicit PostgreSQL)
      - Maintenance database: postgres
      - Username: contapp_user
-     - Password: Conta2025App
+     - Password: YOUR_PASSWORD_HERE
 
 4. **Conectare la Baza de Date**:
    - După conectare, navigați la: Servers > ContApp Local > Databases > contapp
