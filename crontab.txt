@@ -1,0 +1,5 @@
+# Restart ContApp every 5 minutes if not running
+*/5 * * * * nobody /var/www-tools/contapp/scripts/check_running.sh >/dev/null 2>&1
+
+# Restart pgAdmin every 5 minutes if not running
+*/5 * * * * nobody /var/www-tools/pgadmin/check_running.sh >/dev/null 2>&1

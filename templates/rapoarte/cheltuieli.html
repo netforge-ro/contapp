@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Raport Cheltuieli - ContApp{% endblock %}
+
+{% block page_title %}Raport Cheltuieli{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('rapoarte.index') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Înapoi la Rapoarte
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Cheltuieli în perioada</h6>
+        <form class="d-flex">
+            <div class="input-group me-2" style="width: 200px;">
+                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                <input type="date" class="form-control" name="start_date" value="{{ start_date }}">
+            </div>
+            <div class="input-group me-2" style="width: 200px;">
+                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                <input type="date" class="form-control" name="end_date" value="{{ end_date }}">
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-filter"></i> Filtrează
+            </button>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Nr. Factură</th>
+                        <th>Data</th>
+                        <th>Furnizor</th>
+                        <th>Valoare (fără TVA)</th>
+                        <th>TVA</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for factura in facturi %}
+                    <tr>
+                        <td>{{ factura.serie }}{{ factura.numar }}</td>
+                        <td>{{ factura.data_emitere.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ factura.furnizor.nume }}</td>
+                        <td>{{ (factura.valoare_totala - factura.valoare_tva)|round(2) }} Lei</td>
+                        <td>{{ factura.valoare_tva|round(2) }} Lei</td>
+                        <td>{{ factura.valoare_totala|round(2) }} Lei</td>
+                        <td>
+                            {% if factura.achitata %}
+                            <span class="badge bg-success">Achitată</span>
+                            {% else %}
+                            <span class="badge bg-danger">Neachitată</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-dark">
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td><strong>{{ (total - total_tva)|round(2) }} Lei</strong></td>
+                        <td><strong>{{ total_tva|round(2) }} Lei</strong></td>
+                        <td><strong>{{ total|round(2) }} Lei</strong></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Distribuție cheltuieli pe furnizori</h6>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="chartCheltuieliFurnizori"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Top furnizori</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Furnizor</th>
+                                <th>Număr facturi</th>
+                                <th>Valoare totală</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set furnizori_summe = {} %}
+                            {% set furnizori_count = {} %}
+                            
+                            {% for factura in facturi %}
+                                {% if factura.furnizor.id in furnizori_summe %}
+                                    {% set _ = furnizori_summe.update({factura.furnizor.id: furnizori_summe[factura.furnizor.id] + factura.valoare_totala}) %}
+                                    {% set _ = furnizori_count.update({factura.furnizor.id: furnizori_count[factura.furnizor.id] + 1}) %}
+                                {% else %}
+                                    {% set _ = furnizori_summe.update({factura.furnizor.id: factura.valoare_totala}) %}
+                                    {% set _ = furnizori_count.update({factura.furnizor.id: 1}) %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% set top_furnizori = [] %}
+                            {% for furnizor in facturi|map(attribute='furnizor')|unique %}
+                                {% set _ = top_furnizori.append((furnizor, furnizori_summe[furnizor.id], furnizori_count[furnizor.id])) %}
+                            {% endfor %}
+                            
+                            {% for furnizor, suma, count in top_furnizori|sort(attribute='1', reverse=true)|slice(0, 5) %}
+                            <tr>
+                                <td>{{ furnizor.nume }}</td>
+                                <td>{{ count }}</td>
+                                <td>{{ suma|round(2) }} Lei</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Distribuție cheltuieli pe furnizori
+        var ctxFurnizori = document.getElementById('chartCheltuieliFurnizori');
+        
+        {% set furnizori_labels = [] %}
+        {% set furnizori_data = [] %}
+        
+        {% set furnizori_summe = {} %}
+        {% for factura in facturi %}
+            {% if factura.furnizor.id in furnizori_summe %}
+                {% set _ = furnizori_summe.update({factura.furnizor.id: furnizori_summe[factura.furnizor.id] + factura.valoare_totala}) %}
+            {% else %}
+                {% set _ = furnizori_summe.update({factura.furnizor.id: factura.valoare_totala}) %}
+            {% endif %}
+        {% endfor %}
+        
+        {% for furnizor in facturi|map(attribute='furnizor')|unique %}
+            {% set _ = furnizori_labels.append(furnizor.nume) %}
+            {% set _ = furnizori_data.append(furnizori_summe[furnizor.id]) %}
+        {% endfor %}
+        
+        if (ctxFurnizori) {
+            var chartCheltuieliFurnizori = new Chart(ctxFurnizori, {
+                type: 'pie',
+                data: {
+                    labels: {{ furnizori_labels|tojson }},
+                    datasets: [{
+                        data: {{ furnizori_data|tojson }},
+                        backgroundColor: [
+                            'rgba(25, 118, 210, 0.8)',
+                            'rgba(245, 124, 0, 0.8)',
+                            'rgba(56, 142, 60, 0.8)',
+                            'rgba(211, 47, 47, 0.8)',
+                            'rgba(123, 31, 162, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(25, 118, 210, 1)',
+                            'rgba(245, 124, 0, 1)',
+                            'rgba(56, 142, 60, 1)',
+                            'rgba(211, 47, 47, 1)',
+                            'rgba(123, 31, 162, 1)'
+                        ],
+                        borderWidth: 1,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 25, 41, 0.9)',
+                            bodyFont: {
+                                weight: 'bold'
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += parseFloat(context.raw).toFixed(2) + ' Lei';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

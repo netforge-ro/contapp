@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Adaugă Factură - ContApp{% endblock %}
+
+{% block page_title %}Adaugă Factură Nouă{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('facturi.index') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Înapoi la Facturi
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST" id="facturaForm">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Informații Factură</h5>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="serie" class="form-label">Serie</label>
+                            <input type="text" class="form-control" id="serie" name="serie" required maxlength="10" value="FAC">
+                        </div>
+                        <div class="col-md-8">
+                            <label for="numar" class="form-label">Număr</label>
+                            <input type="number" class="form-control" id="numar" name="numar" required min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="data_emitere" class="form-label">Data Emitere</label>
+                            <input type="date" class="form-control" id="data_emitere" name="data_emitere" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="data_scadenta" class="form-label">Data Scadență</label>
+                            <input type="date" class="form-control" id="data_scadenta" name="data_scadenta" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="client_id" class="form-label">Client</label>
+                        <select class="form-select" id="client_id" name="client_id" required>
+                            <option value="">Selectează client</option>
+                            {% for client in clienti %}
+                            <option value="{{ client.id }}">{{ client.nume }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="metoda_plata" class="form-label">Metodă Plată</label>
+                        <select class="form-select" id="metoda_plata" name="metoda_plata">
+                            <option value="Transfer bancar">Transfer bancar</option>
+                            <option value="Numerar">Numerar</option>
+                            <option value="Card">Card</option>
+                            <option value="Ordin de plată">Ordin de plată</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="achitata" name="achitata">
+                            <label class="form-check-label" for="achitata">
+                                Factură achitată
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5>Detalii Client</h5>
+                    <hr>
+                    <div id="client-details">
+                        <p class="text-muted">Selectați un client pentru a vedea detaliile.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h5>Produse și Servicii</h5>
+            <hr>
+            
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered" id="produse-table">
+                    <thead>
+                        <tr>
+                            <th>Produs</th>
+                            <th width="100">Cantitate</th>
+                            <th width="150">Preț Unitar</th>
+                            <th width="100">TVA (%)</th>
+                            <th width="150">Valoare</th>
+                            <th width="100">Acțiuni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="product-row-1">
+                            <td>
+                                <select class="form-select product-select" name="produse[]" required>
+                                    <option value="">Selectează produs</option>
+                                    {% for produs in produse %}
+                                    <option value="{{ produs.id }}" data-pret="{{ produs.pret_vanzare }}" data-tva="{{ produs.tva }}">{{ produs.nume }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control quantity" name="cantitati[]" min="1" value="1" required>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control price" name="preturi[]" step="0.01" required>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control tva" name="tva[]" value="19" required>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control total" name="valori[]" step="0.01" readonly>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm remove-product">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mb-4">
+                <button type="button" class="btn btn-secondary" id="add-product">
+                    <i class="fas fa-plus"></i> Adaugă Produs
+                </button>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="observatii" class="form-label">Observații</label>
+                        <textarea class="form-control" id="observatii" name="observatii" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">0.00 Lei</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>TVA:</span>
+                                <span id="total-tva">0.00 Lei</span>
+                            </div>
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total:</span>
+                                <span id="total">0.00 Lei</span>
+                            </div>
+                            
+                            <input type="hidden" name="valoare_totala" id="valoare_totala">
+                            <input type="hidden" name="valoare_tva" id="valoare_tva">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează Factura
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set current date as default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('data_emitere').value = today;
+        
+        // Set default scadenta to today + 30 days
+        const scadenta = new Date();
+        scadenta.setDate(scadenta.getDate() + 30);
+        document.getElementById('data_scadenta').value = scadenta.toISOString().split('T')[0];
+        
+        // Client details display
+        document.getElementById('client_id').addEventListener('change', function() {
+            const clientId = this.value;
+            if (clientId) {
+                // In a real app, you would fetch client details via AJAX
+                // For now, we'll just show a placeholder
+                document.getElementById('client-details').innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Date Client Selectat</h6>
+                            <p>Detaliile clientului ar apărea aici când implementați funcționalitatea.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('client-details').innerHTML = `
+                    <p class="text-muted">Selectați un client pentru a vedea detaliile.</p>
+                `;
+            }
+        });
+        
+        // Add product row
+        document.getElementById('add-product').addEventListener('click', function() {
+            const table = document.querySelector('#produse-table tbody');
+            const rowCount = table.rows.length;
+            const newRow = table.rows[0].cloneNode(true);
+            
+            newRow.id = 'product-row-' + (rowCount + 1);
+            newRow.querySelectorAll('input').forEach(input => {
+                input.value = input.name === 'tva[]' ? 19 : (input.name === 'cantitati[]' ? 1 : '');
+            });
+            newRow.querySelector('select').selectedIndex = 0;
+            
+            table.appendChild(newRow);
+            attachProductEvents(newRow);
+        });
+        
+        // Attach events to product rows
+        function attachProductEvents(row) {
+            // Product selection
+            row.querySelector('.product-select').addEventListener('change', function() {
+                const option = this.options[this.selectedIndex];
+                if (option.value) {
+                    const price = option.getAttribute('data-pret');
+                    const tva = option.getAttribute('data-tva');
+                    
+                    row.querySelector('.price').value = price;
+                    row.querySelector('.tva').value = tva;
+                    
+                    updateRowTotal(row);
+                }
+            });
+            
+            // Quantity change
+            row.querySelector('.quantity').addEventListener('input', function() {
+                updateRowTotal(row);
+            });
+            
+            // Price change
+            row.querySelector('.price').addEventListener('input', function() {
+                updateRowTotal(row);
+            });
+            
+            // TVA change
+            row.querySelector('.tva').addEventListener('input', function() {
+                updateRowTotal(row);
+            });
+            
+            // Remove product
+            row.querySelector('.remove-product').addEventListener('click', function() {
+                if (document.querySelectorAll('#produse-table tbody tr').length > 1) {
+                    row.remove();
+                    updateTotals();
+                } else {
+                    alert('Factura trebuie să conțină cel puțin un produs!');
+                }
+            });
+        }
+        
+        // Update row total
+        function updateRowTotal(row) {
+            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.price').value) || 0;
+            const tva = parseFloat(row.querySelector('.tva').value) || 0;
+            
+            const rowTotal = quantity * price;
+            row.querySelector('.total').value = rowTotal.toFixed(2);
+            
+            updateTotals();
+        }
+        
+        // Update all totals
+        function updateTotals() {
+            let subtotal = 0;
+            let totalTva = 0;
+            
+            document.querySelectorAll('#produse-table tbody tr').forEach(row => {
+                const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.price').value) || 0;
+                const tva = parseFloat(row.querySelector('.tva').value) || 0;
+                
+                const rowSubtotal = quantity * price;
+                const rowTva = rowSubtotal * (tva / 100);
+                
+                subtotal += rowSubtotal;
+                totalTva += rowTva;
+            });
+            
+            const total = subtotal + totalTva;
+            
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' Lei';
+            document.getElementById('total-tva').textContent = totalTva.toFixed(2) + ' Lei';
+            document.getElementById('total').textContent = total.toFixed(2) + ' Lei';
+            
+            document.getElementById('valoare_totala').value = total.toFixed(2);
+            document.getElementById('valoare_tva').value = totalTva.toFixed(2);
+        }
+        
+        // Init events for the first row
+        attachProductEvents(document.querySelector('#product-row-1'));
+    });
+</script>
+{% endblock %}

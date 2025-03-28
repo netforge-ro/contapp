@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Factură {{ factura.serie }}{{ factura.numar }} - ContApp{% endblock %}
+
+{% block page_title %}Factură {{ factura.serie }}{{ factura.numar }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('facturi.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Facturi
+    </a>
+    <a href="{{ url_for('facturi.editeaza', id=factura.id) }}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Editează
+    </a>
+    <button type="button" class="btn btn-success" onclick="window.print()">
+        <i class="fas fa-print"></i> Printează
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="row mb-4 print-area">
+            <div class="col-md-6">
+                <h4 class="mb-3">FACTURĂ</h4>
+                <div class="mb-3">
+                    <strong>Serie/Număr:</strong> {{ factura.serie }}{{ factura.numar }}
+                </div>
+                <div class="mb-3">
+                    <strong>Data Emitere:</strong> {{ factura.data_emitere.strftime('%d.%m.%Y') }}
+                </div>
+                <div class="mb-3">
+                    <strong>Data Scadență:</strong> {{ factura.data_scadenta.strftime('%d.%m.%Y') }}
+                </div>
+                <div class="mb-3">
+                    <strong>Metodă Plată:</strong> {{ factura.metoda_plata }}
+                </div>
+                <div class="mb-3">
+                    <strong>Status:</strong> 
+                    {% if factura.achitata %}
+                    <span class="badge bg-success">Achitată</span>
+                    {% else %}
+                    <span class="badge bg-danger">Neachitată</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="mb-3">Client</h5>
+                <div class="mb-3">
+                    <strong>Nume:</strong> {{ factura.client.nume }}
+                </div>
+                <div class="mb-3">
+                    <strong>CUI:</strong> {{ factura.client.cui }}
+                </div>
+                <div class="mb-3">
+                    <strong>Adresa:</strong> {{ factura.client.adresa }}, {{ factura.client.oras }}, {{ factura.client.judet }}
+                </div>
+                <div class="mb-3">
+                    <strong>Telefon:</strong> {{ factura.client.telefon }}
+                </div>
+                <div class="mb-3">
+                    <strong>Email:</strong> {{ factura.client.email }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-responsive mb-4 print-area">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Produs</th>
+                        <th>Cantitate</th>
+                        <th>Preț Unitar</th>
+                        <th>TVA (%)</th>
+                        <th>Valoare TVA</th>
+                        <th>Valoare Totală</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detaliu in factura.detalii %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ detaliu.produs.nume }}</td>
+                        <td>{{ detaliu.cantitate }} {{ detaliu.produs.unitate_masura }}</td>
+                        <td>{{ detaliu.pret_unitar|round(2) }} Lei</td>
+                        <td>{{ detaliu.tva }}%</td>
+                        <td>{{ detaliu.valoare_tva|round(2) }} Lei</td>
+                        <td>{{ detaliu.valoare|round(2) }} Lei</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text-end"><strong>Subtotal:</strong></td>
+                        <td colspan="2">{{ (factura.valoare_totala - factura.valoare_tva)|round(2) }} Lei</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-end"><strong>TVA Total:</strong></td>
+                        <td colspan="2">{{ factura.valoare_tva|round(2) }} Lei</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5" class="text-end"><strong>Total:</strong></td>
+                        <td colspan="2"><strong>{{ factura.valoare_totala|round(2) }} Lei</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        {% if factura.observatii %}
+        <div class="print-area">
+            <h5>Observații</h5>
+            <p>{{ factura.observatii }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .print-area, .print-area * {
+            visibility: visible;
+        }
+        .card {
+            box-shadow: none !important;
+            border: none !important;
+        }
+        .print-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    }
+</style>
+{% endblock %}

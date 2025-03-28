@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Rapoarte - ContApp{% endblock %}
+
+{% block page_title %}Rapoarte{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-chart-line fa-4x text-primary"></i>
+                </div>
+                <h5 class="card-title">Raport Vânzări</h5>
+                <p class="card-text">Analiză vânzări pe perioade, clienți și produse</p>
+                <a href="{{ url_for('rapoarte.vanzari') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-right"></i> Vizualizează
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-money-bill-wave fa-4x text-danger"></i>
+                </div>
+                <h5 class="card-title">Raport Cheltuieli</h5>
+                <p class="card-text">Analiză cheltuieli pe categorii și furnizori</p>
+                <a href="{{ url_for('rapoarte.cheltuieli') }}" class="btn btn-danger">
+                    <i class="fas fa-arrow-right"></i> Vizualizează
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-boxes fa-4x text-success"></i>
+                </div>
+                <h5 class="card-title">Raport Stocuri</h5>
+                <p class="card-text">Inventar stocuri, produse cu stoc minim</p>
+                <a href="{{ url_for('rapoarte.stocuri') }}" class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> Vizualizează
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-users fa-4x text-info"></i>
+                </div>
+                <h5 class="card-title">Raport Clienți</h5>
+                <p class="card-text">Analiză clienți, facturi neachitate, sold</p>
+                <a href="{{ url_for('rapoarte.clienti') }}" class="btn btn-info">
+                    <i class="fas fa-arrow-right"></i> Vizualizează
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-truck fa-4x text-warning"></i>
+                </div>
+                <h5 class="card-title">Raport Furnizori</h5>
+                <p class="card-text">Analiză furnizori, facturi neachitate, sold</p>
+                <a href="{{ url_for('rapoarte.furnizori') }}" class="btn btn-warning">
+                    <i class="fas fa-arrow-right"></i> Vizualizează
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
