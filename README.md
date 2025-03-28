@@ -1,4 +1,9 @@
-# ContApp - Sistem Românesc de Contabilitate
+# ContApp - Sistem de Contabilitate
+
+```bash
+sudo pkill -f "gunicorn.*contapp.*wsgi:application"
+cd /var/www-tools/contapp && sudo -u nobody ./scripts/check_running.sh
+```
 
 ContApp este o aplicație web modernă pentru gestionarea facturării, furnizorilor, stocurilor, clienților și rapoartelor financiare, dezvoltată integral în limba română pentru mediul universitar.
 

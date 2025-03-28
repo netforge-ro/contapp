@@ -20,7 +20,8 @@ def adauga():
         if ultima_factura:
             numar = ultima_factura.numar + 1
         else:
-            numar = 1
+            # Start from 6 to account for the previous 5 invoices
+            numar = 6
             
         data_emitere = datetime.strptime(request.form.get('data_emitere'), '%Y-%m-%d')
         data_scadenta = datetime.strptime(request.form.get('data_scadenta'), '%Y-%m-%d')
@@ -104,7 +105,8 @@ def adauga():
     if ultima_factura:
         next_numar = ultima_factura.numar + 1
     else:
-        next_numar = 1
+        # Start from 6 to account for the previous 5 invoices
+        next_numar = 6
     
     return render_template('facturi/adauga.html', clienti=clienti, produse=produse, next_numar=next_numar)
 
