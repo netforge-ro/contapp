@@ -52,3 +52,22 @@ def ajustare():
     
     produse = Produs.query.filter_by(activ=True).all()
     return render_template('stocuri/ajustare.html', produse=produse)
+
+# Routes pentru dezvoltări viitoare, conform diagramelor
+@bp.route('/depozite')
+def depozite():
+    # Această funcționalitate va fi implementată ulterior, conform diagramelor
+    flash('Funcționalitatea de gestionare a depozitelor va fi disponibilă într-o versiune viitoare.', 'info')
+    return redirect(url_for('stocuri.index'))
+
+@bp.route('/comenzi')
+def comenzi():
+    # Această funcționalitate va fi implementată ulterior, conform diagramelor
+    flash('Funcționalitatea de gestionare a comenzilor va fi disponibilă într-o versiune viitoare.', 'info')
+    return redirect(url_for('stocuri.index'))
+
+@bp.route('/plati')
+def plati():
+    # Această funcționalitate va fi implementată ulterior, conform diagramelor
+    flash('Funcționalitatea de gestionare a plăților va fi disponibilă într-o versiune viitoare.', 'info')
+    return redirect(url_for('stocuri.index'))

@@ -16,6 +16,23 @@
         <i class="fas fa-tags"></i> Categorii
     </a>
 </div>
+
+<div class="mt-2 mb-2">
+    <div class="alert alert-info">
+        <h6 class="mb-2">Funcționalități viitoare (conform diagramelor relaționale)</h6>
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('stocuri.depozite') }}" class="btn btn-outline-info">
+                <i class="fas fa-warehouse"></i> Depozite <span class="badge bg-warning">În curând</span>
+            </a>
+            <a href="{{ url_for('stocuri.comenzi') }}" class="btn btn-outline-info">
+                <i class="fas fa-shopping-cart"></i> Comenzi <span class="badge bg-warning">În curând</span>
+            </a>
+            <a href="{{ url_for('stocuri.plati') }}" class="btn btn-outline-info">
+                <i class="fas fa-money-bill-wave"></i> Plăți <span class="badge bg-warning">În curând</span>
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}
