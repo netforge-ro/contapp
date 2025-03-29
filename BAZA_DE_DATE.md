@@ -28,44 +28,45 @@ Datele sunt organizate în tabele interconectate prin relații de tip "cheie pri
 
 ## Schema Bazei de Date
 
-Baza de date `contapp` este structurată conform modelului entitate-relație prezentat în diagramele de mai jos.
+Baza de date `contapp` conține următoarele tabele principale:
 
-### Diagrama Relațională
+- `clienti` - Informații despre clienți
+- `furnizori` - Informații despre furnizori
+- `categorii_produse_cheltuieli` - Categorii pentru produse și cheltuieli
+- `produse` - Catalogul de produse și servicii
+- `facturi` - Facturile emise către clienți
+- `detalii_facturi` - Liniile de produse din facturi
+- `facturi_primite` - Facturile primite de la furnizori
+- `miscari_stoc` - Mișcările de stoc (intrări, ieșiri, ajustări)
+
+### Proiecție de Dezvoltare Viitoare
+
+Pentru o versiune viitoare a sistemului, se are în vedere extinderea și îmbunătățirea bazei de date conform următoarelor diagrame:
+
+#### Diagrama Relațională
 
 ![Diagrama Relațională](/var/www-tools/proiect-sifc/01.schema-relationala.jpg)
 
-Diagrama relațională prezintă structura tabelelor din baza de date și conexiunile dintre acestea. Structura include entități pentru furnizori, produse, facturi, comenzi, plăți, depozite și stocuri. Cheile primare (CP) și cheile străine (CS) sunt evidențiate pentru a ilustra relațiile dintre tabele.
+Diagrama relațională de mai sus prezintă o structură extinsă a bazei de date, care urmează să fie implementată în versiunile următoare ale aplicației. Aceasta include entități suplimentare pentru furnizori, produse, facturi, comenzi, plăți, depozite și stocuri. Cheile primare (CP) și cheile străine (CS) sunt evidențiate pentru a ilustra relațiile dintre tabele.
 
-### Diagrama Entitate-Relație
+#### Diagrama Entitate-Relație
 
 ![Diagrama Entitate-Relație](/var/www-tools/proiect-sifc/02.diagrama-entitate-relatie.jpg)
 
-Diagrama entitate-relație ilustrează legăturile logice dintre diferitele entități din sistem și cardinalitatea acestora (1:1, 1:M, 0:M). Relațiile cheie includ:
+Diagrama entitate-relație ilustrează legăturile logice dintre diferitele entități din viitorul sistem și cardinalitatea acestora (1:1, 1:M, 0:M). Relațiile cheie care vor fi implementate includ:
 - Furnizor EMITE Factură (1:1)
 - Furnizor PRIMEȘTE Comandă (1:M)
 - Comandă NECESITĂ Plată (1:M)
 - Produs ESTE ÎN STOC Depozit (0:M)
 - Comandă CONȚINE Produs (1:M)
 
-### Schema Logică
+#### Schema Logică
 
 ![Schema Logică](/var/www-tools/proiect-sifc/03.schema-logica.jpg)
 
-Schema logică detaliază entitățile ca tabele parentale și copii, cu relațiile specificate explicit între acestea (emite, primește, necesită, este în stoc, etc.). Această reprezentare ajută la înțelegerea fluxului de date și a dependențelor dintre componentele sistemului.
+Schema logică detaliază entitățile planificate ca tabele parentale și copii, cu relațiile specificate explicit între acestea (emite, primește, necesită, este în stoc, etc.). Această reprezentare va ghida dezvoltarea viitoare a aplicației, ajutând la înțelegerea fluxului de date și a dependențelor dintre componentele sistemului.
 
-Baza de date `contapp` conține următoarele tabele principale:
-
-- `furnizori` - Informații despre furnizori
-- `produse` - Catalogul de produse și servicii
-- `facturi` - Facturile emise de furnizori
-- `comenzi` - Comenzile plasate către furnizori
-- `plati` - Plățile efectuate pentru comenzi
-- `depozite` - Informații despre locațiile de depozitare
-- `stocuri` - Stocurile curente de produse
-- `produse_comandate` - Produsele incluse în comenzi
-- `categorii_produse_cheltuieli` - Categorii pentru produse și cheltuieli
-- `detalii_facturi` - Liniile de produse din facturi
-- `miscari_stoc` - Mișcările de stoc (intrări, ieșiri, ajustări)
+Aceste diagrame reprezintă o extindere planificată a actualei baze de date `contapp` și vor fi implementate treptat în versiunile viitoare ale aplicației.
 
 ## Descrierea Tabelelor
 
