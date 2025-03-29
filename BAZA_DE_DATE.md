@@ -45,13 +45,13 @@ Pentru o versiune viitoare a sistemului, se are în vedere extinderea și îmbun
 
 #### Diagrama Relațională
 
-![Diagrama Relațională](/var/www-tools/proiect-sifc/01.schema-relationala.jpg)
+![Diagrama Relațională](md.img/01.schema-relationala.jpg)
 
 Diagrama relațională de mai sus prezintă o structură extinsă a bazei de date, care urmează să fie implementată în versiunile următoare ale aplicației. Aceasta include entități suplimentare pentru furnizori, produse, facturi, comenzi, plăți, depozite și stocuri. Cheile primare (CP) și cheile străine (CS) sunt evidențiate pentru a ilustra relațiile dintre tabele.
 
 #### Diagrama Entitate-Relație
 
-![Diagrama Entitate-Relație](/var/www-tools/proiect-sifc/02.diagrama-entitate-relatie.jpg)
+![Diagrama Entitate-Relație](md.img/02.diagrama-entitate-relatie.jpg)
 
 Diagrama entitate-relație ilustrează legăturile logice dintre diferitele entități din viitorul sistem și cardinalitatea acestora (1:1, 1:M, 0:M). Relațiile cheie care vor fi implementate includ:
 - Furnizor EMITE Factură (1:1)
@@ -62,7 +62,7 @@ Diagrama entitate-relație ilustrează legăturile logice dintre diferitele enti
 
 #### Schema Logică
 
-![Schema Logică](/var/www-tools/proiect-sifc/03.schema-logica.jpg)
+![Schema Logică](md.img/03.schema-logica.jpg)
 
 Schema logică detaliază entitățile planificate ca tabele parentale și copii, cu relațiile specificate explicit între acestea (emite, primește, necesită, este în stoc, etc.). Această reprezentare va ghida dezvoltarea viitoare a aplicației, ajutând la înțelegerea fluxului de date și a dependențelor dintre componentele sistemului.
 

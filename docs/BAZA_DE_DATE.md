@@ -6,6 +6,9 @@
 
 1. [Introducere](#introducere)
 2. [Schema Bazei de Date](#schema-bazei-de-date)
+   - [Diagrama Relațională](#diagrama-relațională)
+   - [Diagrama Entitate-Relație](#diagrama-entitate-relație)
+   - [Schema Logică](#schema-logică)
 3. [Descrierea Tabelelor](#descrierea-tabelelor)
 4. [Relații între Tabele](#relații-între-tabele)
 5. [Accesarea și Gestionarea Bazei de Date cu pgAdmin](#accesarea-și-gestionarea-bazei-de-date-cu-pgadmin)
@@ -35,6 +38,35 @@ Baza de date `contapp` conține următoarele tabele principale:
 - `detalii_facturi` - Liniile de produse din facturi
 - `facturi_primite` - Facturile primite de la furnizori
 - `miscari_stoc` - Mișcările de stoc (intrări, ieșiri, ajustări)
+
+### Proiecție de Dezvoltare Viitoare
+
+Pentru o versiune viitoare a sistemului, se are în vedere extinderea și îmbunătățirea bazei de date conform următoarelor diagrame:
+
+#### Diagrama Relațională
+
+![Diagrama Relațională](../md.img/01.schema-relationala.jpg)
+
+Diagrama relațională de mai sus prezintă o structură extinsă a bazei de date, care urmează să fie implementată în versiunile următoare ale aplicației. Aceasta include entități suplimentare pentru furnizori, produse, facturi, comenzi, plăți, depozite și stocuri. Cheile primare (CP) și cheile străine (CS) sunt evidențiate pentru a ilustra relațiile dintre tabele.
+
+#### Diagrama Entitate-Relație
+
+![Diagrama Entitate-Relație](../md.img/02.diagrama-entitate-relatie.jpg)
+
+Diagrama entitate-relație ilustrează legăturile logice dintre diferitele entități din viitorul sistem și cardinalitatea acestora (1:1, 1:M, 0:M). Relațiile cheie care vor fi implementate includ:
+- Furnizor EMITE Factură (1:1)
+- Furnizor PRIMEȘTE Comandă (1:M)
+- Comandă NECESITĂ Plată (1:M)
+- Produs ESTE ÎN STOC Depozit (0:M)
+- Comandă CONȚINE Produs (1:M)
+
+#### Schema Logică
+
+![Schema Logică](../md.img/03.schema-logica.jpg)
+
+Schema logică detaliază entitățile planificate ca tabele parentale și copii, cu relațiile specificate explicit între acestea (emite, primește, necesită, este în stoc, etc.). Această reprezentare va ghida dezvoltarea viitoare a aplicației, ajutând la înțelegerea fluxului de date și a dependențelor dintre componentele sistemului.
+
+Aceste diagrame reprezintă o extindere planificată a actualei baze de date `contapp` și vor fi implementate treptat în versiunile viitoare ale aplicației.
 
 ## Descrierea Tabelelor
 
