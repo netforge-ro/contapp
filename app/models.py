@@ -1,6 +1,25 @@
 from app import db
 from datetime import datetime
 
+class Client(db.Model):
+    __tablename__ = 'clienti'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nume = db.Column(db.String(100), nullable=False)
+    cui = db.Column(db.String(20), unique=True)
+    adresa = db.Column(db.String(255))
+    oras = db.Column(db.String(100))
+    judet = db.Column(db.String(100))
+    telefon = db.Column(db.String(20))
+    email = db.Column(db.String(100))
+    data_adaugare = db.Column(db.DateTime, default=datetime.utcnow)
+    activ = db.Column(db.Boolean, default=True)
+    
+    facturi = db.relationship('Factura', backref='client', lazy=True)
+    
+    def __repr__(self):
+        return f'<Client {self.nume}>'
+
 class Furnizor(db.Model):
     __tablename__ = 'furnizori'
     
@@ -8,15 +27,15 @@ class Furnizor(db.Model):
     nume = db.Column(db.String(100), nullable=False)
     cui = db.Column(db.String(20), unique=True)
     adresa = db.Column(db.String(255))
+    oras = db.Column(db.String(100))
+    judet = db.Column(db.String(100))
     telefon = db.Column(db.String(20))
-    cod_fiscal = db.Column(db.String(20))
-    cont_bancar = db.Column(db.String(50))
-    sold_furnizor = db.Column(db.Numeric(10, 2), default=0)
+    email = db.Column(db.String(100))
     data_adaugare = db.Column(db.DateTime, default=datetime.utcnow)
     activ = db.Column(db.Boolean, default=True)
     
-    facturi = db.relationship('Factura', backref='furnizor', lazy=True)
-    comenzi = db.relationship('Comanda', backref='furnizor', lazy=True)
+    facturi_primite = db.relationship('FacturaPrimita', backref='furnizor', lazy=True)
+    produse = db.relationship('Produs', backref='furnizor', lazy=True)
     
     def __repr__(self):
         return f'<Furnizor {self.nume}>'
@@ -57,18 +76,19 @@ class Produs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cod = db.Column(db.String(20), unique=True)
     nume = db.Column(db.String(100), nullable=False)
-    unitate_masura = db.Column(db.String(20), default='buc')
-    pret = db.Column(db.Numeric(10, 2), nullable=False)
+    descriere = db.Column(db.Text)
+    pret_achizitie = db.Column(db.Numeric(10, 2), nullable=False)
+    pret_vanzare = db.Column(db.Numeric(10, 2), nullable=False)
     stoc = db.Column(db.Integer, default=0)
-    cod_comanda = db.Column(db.Integer, db.ForeignKey('comenzi.id'), nullable=True)
+    unitate_masura = db.Column(db.String(20), default='buc')
+    tva = db.Column(db.Integer, default=19)
     data_adaugare = db.Column(db.DateTime, default=datetime.utcnow)
     activ = db.Column(db.Boolean, default=True)
     
     categorie_id = db.Column(db.Integer, db.ForeignKey('categorii_produse_cheltuieli.id'))
+    furnizor_id = db.Column(db.Integer, db.ForeignKey('furnizori.id'))
     
     detalii_facturi = db.relationship('DetaliiFactura', backref='produs', lazy=True)
-    stocuri = db.relationship('Stoc', backref='produs', lazy=True)
-    produse_comandate = db.relationship('ProduseComandate', backref='produs', lazy=True)
     miscari_stoc = db.relationship('MiscareStoc', backref='produs', lazy=True)
     
     def __repr__(self):
@@ -78,25 +98,27 @@ class Factura(db.Model):
     __tablename__ = 'facturi'
     
     id = db.Column(db.Integer, primary_key=True)
-    data_factura = db.Column(db.Date, nullable=False, default=datetime.utcnow)
-    serie_factura = db.Column(db.String(10), nullable=False)
-    nr_factura = db.Column(db.Integer, nullable=False)
+    serie = db.Column(db.String(10), nullable=False)
+    numar = db.Column(db.Integer, nullable=False)
+    data_emitere = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     data_scadenta = db.Column(db.Date, nullable=False)
-    valoare = db.Column(db.Numeric(10, 2), nullable=False)
-    modalitate_plata = db.Column(db.String(50), default='Transfer bancar')
+    valoare_totala = db.Column(db.Numeric(10, 2), nullable=False)
+    valoare_tva = db.Column(db.Numeric(10, 2), nullable=False)
+    achitata = db.Column(db.Boolean, default=False)
+    metoda_plata = db.Column(db.String(50), default='Transfer bancar')
     observatii = db.Column(db.Text)
     
-    furnizor_id = db.Column(db.Integer, db.ForeignKey('furnizori.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('clienti.id'), nullable=False)
     
     detalii = db.relationship('DetaliiFactura', backref='factura', lazy=True, cascade='all, delete-orphan')
     miscari_stoc = db.relationship('MiscareStoc', backref='factura', lazy=True)
     
     __table_args__ = (
-        db.UniqueConstraint('serie_factura', 'nr_factura', name='uix_serie_numar'),
+        db.UniqueConstraint('serie', 'numar', name='uix_serie_numar'),
     )
     
     def __repr__(self):
-        return f'<Factura {self.serie_factura}{self.nr_factura}>'
+        return f'<Factura {self.serie}{self.numar}>'
 
 class DetaliiFactura(db.Model):
     __tablename__ = 'detalii_facturi'
@@ -174,6 +196,27 @@ class ProduseComandate(db.Model):
     def __repr__(self):
         return f'<ProduseComandate {self.produs_id} în comanda {self.comanda_id}: {self.cantitate_comandata}>'
 
+class FacturaPrimita(db.Model):
+    __tablename__ = 'facturi_primite'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    serie = db.Column(db.String(10), nullable=False)
+    numar = db.Column(db.String(20), nullable=False)
+    data_emitere = db.Column(db.Date, nullable=False)
+    data_scadenta = db.Column(db.Date, nullable=False)
+    valoare_totala = db.Column(db.Numeric(10, 2), nullable=False)
+    valoare_tva = db.Column(db.Numeric(10, 2), nullable=False)
+    achitata = db.Column(db.Boolean, default=False)
+    metoda_plata = db.Column(db.String(50), default='Transfer bancar')
+    observatii = db.Column(db.Text)
+    
+    furnizor_id = db.Column(db.Integer, db.ForeignKey('furnizori.id'), nullable=False)
+    
+    miscari_stoc = db.relationship('MiscareStoc', backref='factura_primita', lazy=True)
+    
+    def __repr__(self):
+        return f'<FacturaPrimita {self.serie}{self.numar}>'
+
 class MiscareStoc(db.Model):
     __tablename__ = 'miscari_stoc'
     
@@ -185,7 +228,7 @@ class MiscareStoc(db.Model):
     
     produs_id = db.Column(db.Integer, db.ForeignKey('produse.id'), nullable=False)
     factura_id = db.Column(db.Integer, db.ForeignKey('facturi.id'), nullable=True)
-    comanda_id = db.Column(db.Integer, db.ForeignKey('comenzi.id'), nullable=True)
+    factura_primita_id = db.Column(db.Integer, db.ForeignKey('facturi_primite.id'), nullable=True)
     
     def __repr__(self):
-        return f'<MiscareStoc {self.tip} {self.cantitate} produs_id:{self.produs_id}>'
+        return f'<MiscareStoc {self.tip} {self.cantitate} {self.produs_id}>'
