@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Editează Furnizor - {{ furnizor.nume }} - ContApp{% endblock %}
+
+{% block page_title %}Editează Furnizor{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('furnizori.index') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Înapoi la Furnizori
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="nume" class="form-label">Nume Furnizor *</label>
+                        <input type="text" class="form-control" id="nume" name="nume" required value="{{ furnizor.nume }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cui" class="form-label">CUI/CIF</label>
+                        <input type="text" class="form-control" id="cui" name="cui" value="{{ furnizor.cui or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cod_fiscal" class="form-label">Cod Fiscal</label>
+                        <input type="text" class="form-control" id="cod_fiscal" name="cod_fiscal" value="{{ furnizor.cod_fiscal or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adresa" class="form-label">Adresă</label>
+                        <textarea class="form-control" id="adresa" name="adresa" rows="3">{{ furnizor.adresa or '' }}</textarea>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="telefon" class="form-label">Telefon</label>
+                        <input type="text" class="form-control" id="telefon" name="telefon" value="{{ furnizor.telefon or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cont_bancar" class="form-label">Cont Bancar</label>
+                        <input type="text" class="form-control" id="cont_bancar" name="cont_bancar" value="{{ furnizor.cont_bancar or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sold_furnizor" class="form-label">Sold Furnizor (Lei)</label>
+                        <input type="number" class="form-control" id="sold_furnizor" name="sold_furnizor" step="0.01" value="{{ furnizor.sold_furnizor or 0 }}">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="activ" name="activ" {% if furnizor.activ %}checked{% endif %}>
+                        <label class="form-check-label" for="activ">Furnizor activ</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează Modificările
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Furnizor Button -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-danger">Zonă Periculoasă</h6>
+    </div>
+    <div class="card-body">
+        <p>Atenție: Ștergerea unui furnizor va șterge toate datele asociate, inclusiv facturile primite și comenzile.</p>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="fas fa-trash"></i> Șterge Furnizor
+        </button>
+        
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirmare ștergere</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Sunteți sigur că doriți să ștergeți furnizorul {{ furnizor.nume }}?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                        <form action="{{ url_for('furnizori.sterge', id=furnizor.id) }}" method="POST">
+                            <button type="submit" class="btn btn-danger">Șterge</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

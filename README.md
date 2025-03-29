@@ -7,7 +7,7 @@ cd /var/www-tools/contapp && sudo -u nobody ./scripts/check_running.sh
 
 ContApp este o aplicație web pentru gestionarea facturării, furnizorilor, stocurilor, clienților și rapoartelor financiare, dezvoltată integral în limba română pentru mediul universitar.
 
-![ContApp Dashboard](screenshots/dashboard.png)
+![ContApp Dashboard](md.img/app-screenshot.png)
 
 ## Funcționalități principale
 

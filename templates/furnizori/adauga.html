@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Adaugă Furnizor Nou - ContApp{% endblock %}
+
+{% block page_title %}Adaugă Furnizor Nou{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('furnizori.index') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Înapoi la Furnizori
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="nume" class="form-label">Nume Furnizor *</label>
+                        <input type="text" class="form-control" id="nume" name="nume" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cui" class="form-label">CUI/CIF</label>
+                        <input type="text" class="form-control" id="cui" name="cui">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cod_fiscal" class="form-label">Cod Fiscal</label>
+                        <input type="text" class="form-control" id="cod_fiscal" name="cod_fiscal">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adresa" class="form-label">Adresă</label>
+                        <textarea class="form-control" id="adresa" name="adresa" rows="3"></textarea>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="telefon" class="form-label">Telefon</label>
+                        <input type="text" class="form-control" id="telefon" name="telefon">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cont_bancar" class="form-label">Cont Bancar</label>
+                        <input type="text" class="form-control" id="cont_bancar" name="cont_bancar">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="sold_furnizor" class="form-label">Sold Furnizor (Lei)</label>
+                        <input type="number" class="form-control" id="sold_furnizor" name="sold_furnizor" step="0.01" value="0">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="activ" name="activ" checked>
+                        <label class="form-check-label" for="activ">Furnizor activ</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează Furnizor
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

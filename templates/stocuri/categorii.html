@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Categorii Produse - ContApp{% endblock %}
+
+{% block page_title %}Categorii Produse{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adaugaCategorieModal">
+        <i class="fas fa-plus"></i> Categorie Nouă
+    </button>
+    <a href="{{ url_for('stocuri.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Stocuri
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Toate Categoriile</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Denumire</th>
+                        <th>Descriere</th>
+                        <th>Nr. Produse</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for categorie in categorii %}
+                    <tr>
+                        <td>{{ categorie.id }}</td>
+                        <td>{{ categorie.nume }}</td>
+                        <td>{{ categorie.descriere|truncate(50) }}</td>
+                        <td>{{ categorie.produse|length }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-warning btn-action edit-categorie" 
+                                        data-bs-toggle="modal" data-bs-target="#editeazaCategorieModal"
+                                        data-id="{{ categorie.id }}"
+                                        data-nume="{{ categorie.nume }}"
+                                        data-descriere="{{ categorie.descriere }}">
+                                    <i class="fas fa-edit"></i> Editează
+                                </button>
+                                
+                                {% if categorie.produse|length == 0 %}
+                                <button type="button" class="btn btn-danger btn-action delete-categorie"
+                                        data-bs-toggle="modal" data-bs-target="#stergeCategorieModal"
+                                        data-id="{{ categorie.id }}"
+                                        data-nume="{{ categorie.nume }}">
+                                    <i class="fas fa-trash"></i> Șterge
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn btn-danger btn-action" disabled title="Categoria are produse asociate">
+                                    <i class="fas fa-trash"></i> Șterge
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adaugă Categorie -->
+<div class="modal fade" id="adaugaCategorieModal" tabindex="-1" aria-labelledby="adaugaCategorieModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="adaugaCategorieModalLabel">Adaugă Categorie Nouă</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('stocuri.adauga_categorie') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nume" class="form-label">Denumire Categorie</label>
+                        <input type="text" class="form-control" id="nume" name="nume" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descriere" class="form-label">Descriere</label>
+                        <textarea class="form-control" id="descriere" name="descriere" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editează Categorie -->
+<div class="modal fade" id="editeazaCategorieModal" tabindex="-1" aria-labelledby="editeazaCategorieModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editeazaCategorieModalLabel">Editează Categorie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('stocuri.editeaza_categorie') }}">
+                <div class="modal-body">
+                    <input type="hidden" id="edit_id" name="id" value="">
+                    <div class="mb-3">
+                        <label for="edit_nume" class="form-label">Denumire Categorie</label>
+                        <input type="text" class="form-control" id="edit_nume" name="nume" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_descriere" class="form-label">Descriere</label>
+                        <textarea class="form-control" id="edit_descriere" name="descriere" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează Modificările</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Șterge Categorie -->
+<div class="modal fade" id="stergeCategorieModal" tabindex="-1" aria-labelledby="stergeCategorieModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stergeCategorieModalLabel">Confirmă Ștergerea</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Ești sigur că vrei să ștergi categoria <strong id="delete_nume"></strong>?</p>
+                <p class="text-danger">Această acțiune nu poate fi anulată.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                <form method="POST" action="{{ url_for('stocuri.sterge_categorie') }}">
+                    <input type="hidden" id="delete_id" name="id" value="">
+                    <button type="submit" class="btn btn-danger">Șterge Definitiv</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Editează categorie
+        const editButtons = document.querySelectorAll('.edit-categorie');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const nume = this.dataset.nume;
+                const descriere = this.dataset.descriere;
+                
+                document.getElementById('edit_id').value = id;
+                document.getElementById('edit_nume').value = nume;
+                document.getElementById('edit_descriere').value = descriere;
+            });
+        });
+        
+        // Șterge categorie
+        const deleteButtons = document.querySelectorAll('.delete-categorie');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const nume = this.dataset.nume;
+                
+                document.getElementById('delete_id').value = id;
+                document.getElementById('delete_nume').textContent = nume;
+            });
+        });
+    });
+</script>
+{% endblock %}

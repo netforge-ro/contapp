@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalii Furnizor - {{ furnizor.nume }} - ContApp{% endblock %}
+
+{% block page_title %}Furnizor: {{ furnizor.nume }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('furnizori.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Furnizori
+    </a>
+    <a href="{{ url_for('furnizori.editeaza', id=furnizor.id) }}" class="btn btn-primary">
+        <i class="fas fa-edit"></i> Editează
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informații Furnizor</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th width="150">CUI/CIF</th>
+                                <td>{{ furnizor.cui or 'Nespecificat' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cod Fiscal</th>
+                                <td>{{ furnizor.cod_fiscal or 'Nespecificat' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Adresă</th>
+                                <td>{{ furnizor.adresa or 'Nespecificat' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Telefon</th>
+                                <td>{{ furnizor.telefon or 'Nespecificat' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cont Bancar</th>
+                                <td>{{ furnizor.cont_bancar or 'Nespecificat' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Sold Furnizor</th>
+                                <td>{{ furnizor.sold_furnizor|float|round(2) if furnizor.sold_furnizor else '0.00' }} Lei</td>
+                            </tr>
+                            <tr>
+                                <th>Data Adăugare</th>
+                                <td>{{ furnizor.data_adaugare.strftime('%d.%m.%Y') if furnizor.data_adaugare else 'Nespecificat' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if furnizor.activ %}
+                                    <span class="badge bg-success">Activ</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inactiv</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Statistici</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Total Facturi Primite
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ facturi|length }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-file-invoice fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Valoare Totală
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                            {{ facturi|sum(attribute='valoare_totala')|round(2) }} Lei
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Facturi Primite</h6>
+        <button class="btn btn-sm btn-primary" disabled>
+            <i class="fas fa-plus"></i> Factură Nouă (în curând)
+        </button>
+    </div>
+    <div class="card-body">
+        {% if facturi %}
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Seria/Nr.</th>
+                        <th>Data Emitere</th>
+                        <th>Data Scadență</th>
+                        <th>Valoare</th>
+                        <th>Status</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for factura in facturi %}
+                    <tr>
+                        <td>{{ factura.serie }}{{ factura.numar }}</td>
+                        <td>{{ factura.data_emitere.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ factura.data_scadenta.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ factura.valoare_totala|round(2) }} Lei</td>
+                        <td>
+                            {% if factura.achitata %}
+                            <span class="badge bg-success">Achitată</span>
+                            {% else %}
+                                {% if factura.data_scadenta < now %}
+                                <span class="badge bg-danger">Restantă</span>
+                                {% else %}
+                                <span class="badge bg-warning">Neachitată</span>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-info" disabled>
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-primary" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger" disabled>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Acest furnizor nu are facturi primite.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Comenzi</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Funcționalitatea de gestionare a comenzilor va fi disponibilă într-o versiune viitoare.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Produse Furnizate</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Funcționalitatea de gestionare a produselor furnizate va fi disponibilă într-o versiune viitoare.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#dataTable').DataTable({
+            order: [[1, 'desc']]
+        });
+    });
+</script>
+{% endblock %}

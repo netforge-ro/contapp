@@ -15,6 +15,9 @@
     <button type="button" class="btn btn-success" onclick="window.print()">
         <i class="fas fa-print"></i> Printează
     </button>
+    <a href="{{ url_for('facturi.pdf', id=factura.id) }}" class="btn btn-primary" target="_blank">
+        <i class="bi bi-file-pdf"></i> Salvează PDF
+    </a>
 </div>
 {% endblock %}
 
@@ -122,20 +125,62 @@
 {% block extra_css %}
 <style>
     @media print {
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
         body * {
             visibility: hidden;
         }
+        
         .print-area, .print-area * {
             visibility: visible;
         }
+        
         .card {
             box-shadow: none !important;
             border: none !important;
         }
+        
         .print-area {
             position: absolute;
             left: 0;
             top: 0;
+            width: 100%;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            border: 1px solid #999;
+            padding: 8px;
+        }
+        
+        table th {
+            background-color: #f0f0f0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        table tfoot tr td {
+            font-weight: bold;
+            background-color: #f0f0f0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        
+        /* Print headers on each page */
+        thead {
+            display: table-header-group;
+        }
+        
+        /* Print footers on each page */
+        tfoot {
+            display: table-footer-group;
         }
     }
 </style>

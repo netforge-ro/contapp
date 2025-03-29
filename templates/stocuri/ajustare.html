@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajustare Stoc - ContApp{% endblock %}
+
+{% block page_title %}Ajustare Stoc{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('stocuri.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Stocuri
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Ajustare Cantități Stoc</h6>
+        <p class="text-muted small mt-1 mb-0">
+            Utilizează acest formular pentru a ajusta manual cantitățile în stoc pentru diferite produse.
+            Ajustările pot fi pozitive (adăugare) sau negative (scădere).
+        </p>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('stocuri.ajustare') }}">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="produs_id" class="form-label">Selectează Produs</label>
+                        <select class="form-select" id="produs_id" name="produs_id" required>
+                            <option value="">-- Selectează produs --</option>
+                            {% for produs in produse %}
+                            <option value="{{ produs.id }}" data-stoc="{{ produs.stoc }}" data-um="{{ produs.unitate_masura }}">
+                                {{ produs.cod }} - {{ produs.nume }} (Stoc actual: {{ produs.stoc }} {{ produs.unitate_masura }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-info mt-2">
+                        <div class="card-body">
+                            <h6 class="card-title text-info mb-2">Informații Stoc Actual</h6>
+                            <p class="mb-0" id="info-stoc">Selectează un produs pentru a vedea stocul actual</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="tip_ajustare" class="form-label">Tip Ajustare</label>
+                        <div class="btn-group w-100" role="group" aria-label="Tip Ajustare">
+                            <input type="radio" class="btn-check" name="tip_ajustare" id="ajustare_plus" value="plus" checked>
+                            <label class="btn btn-outline-success" for="ajustare_plus">
+                                <i class="fas fa-plus-circle"></i> Adaugă (Intrare)
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="tip_ajustare" id="ajustare_minus" value="minus">
+                            <label class="btn btn-outline-danger" for="ajustare_minus">
+                                <i class="fas fa-minus-circle"></i> Scade (Ieșire)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cantitate" class="form-label">Cantitate</label>
+                        <input type="number" class="form-control" id="cantitate" name="cantitate" 
+                               min="1" value="1" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="motiv" class="form-label">Motivul Ajustării</label>
+                <select class="form-select" id="motiv" name="motiv" required>
+                    <option value="">-- Selectează motivul --</option>
+                    <option value="Inventariere">Inventariere (Ajustare după inventar)</option>
+                    <option value="Deteriorare">Deteriorare/Produse defecte</option>
+                    <option value="Expirare">Expirare (Produse expirate)</option>
+                    <option value="Returnare">Returnare de la client</option>
+                    <option value="Donație">Donație</option>
+                    <option value="Transfer">Transfer între locații</option>
+                    <option value="Ajustare manuală">Ajustare manuală</option>
+                    <option value="altul">Alt motiv (specificați în observații)</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label for="observatii" class="form-label">Observații</label>
+                <textarea class="form-control" id="observatii" name="observatii" rows="3"
+                          placeholder="Introduceți detalii suplimentare despre această ajustare"></textarea>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">Previzualizare Ajustare</h6>
+                            <p id="preview-message">Efectuarea acestei ajustări va rezulta în:</p>
+                            <div class="alert alert-info" id="preview-result">
+                                Selectează un produs și introdu detaliile ajustării pentru a vedea previzualizarea.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="alert alert-warning w-100 mb-3">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Atenție!</strong>
+                        <p class="mb-0">Această acțiune va modifica stocul produsului selectat și va crea o înregistrare de mișcare stoc.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary me-2" onclick="window.history.back();">Anulează</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează Ajustare
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const produsSelect = document.getElementById('produs_id');
+        const cantitateInput = document.getElementById('cantitate');
+        const ajustarePlusRadio = document.getElementById('ajustare_plus');
+        const ajustareMinusRadio = document.getElementById('ajustare_minus');
+        const infoStoc = document.getElementById('info-stoc');
+        const previewResult = document.getElementById('preview-result');
+        
+        // Actualizează informațiile de stoc când se schimbă produsul selectat
+        produsSelect.addEventListener('change', updateStockInfo);
+        
+        // Actualizează previzualizarea când se schimbă cantitatea sau tipul de ajustare
+        cantitateInput.addEventListener('input', updatePreview);
+        ajustarePlusRadio.addEventListener('change', updatePreview);
+        ajustareMinusRadio.addEventListener('change', updatePreview);
+        
+        function updateStockInfo() {
+            const selectedOption = produsSelect.options[produsSelect.selectedIndex];
+            
+            if (produsSelect.value) {
+                const stocActual = selectedOption.dataset.stoc;
+                const unitateMasura = selectedOption.dataset.um;
+                
+                infoStoc.innerHTML = `
+                    <strong>Stoc actual:</strong> ${stocActual} ${unitateMasura}<br>
+                    <strong>Produs:</strong> ${selectedOption.text.split(' (')[0]}
+                `;
+                
+                // Asigură-te că cantitatea nu poate scădea sub stocul actual pentru minus
+                cantitateInput.max = ajustarePlusRadio.checked ? 99999 : stocActual;
+                
+                updatePreview();
+            } else {
+                infoStoc.textContent = 'Selectează un produs pentru a vedea stocul actual';
+                previewResult.textContent = 'Selectează un produs și introdu detaliile ajustării pentru a vedea previzualizarea.';
+            }
+        }
+        
+        function updatePreview() {
+            if (!produsSelect.value) return;
+            
+            const selectedOption = produsSelect.options[produsSelect.selectedIndex];
+            const stocActual = parseInt(selectedOption.dataset.stoc);
+            const cantitate = parseInt(cantitateInput.value) || 0;
+            const unitateMasura = selectedOption.dataset.um;
+            const isPlus = ajustarePlusRadio.checked;
+            
+            // Calculează stocul nou
+            const stocNou = isPlus ? stocActual + cantitate : stocActual - cantitate;
+            
+            // Verifică dacă stocul nou ar fi negativ
+            if (stocNou < 0) {
+                previewResult.className = 'alert alert-danger';
+                previewResult.innerHTML = `
+                    <strong>Eroare!</strong> Ajustarea negativă ar rezulta într-un stoc negativ. 
+                    Stocul actual este de ${stocActual} ${unitateMasura}.
+                `;
+                return;
+            }
+            
+            // Actualizează previzualizarea
+            const tipAjustare = isPlus ? 
+                '<span class="text-success"><i class="fas fa-plus-circle"></i> Adăugare</span>' : 
+                '<span class="text-danger"><i class="fas fa-minus-circle"></i> Scădere</span>';
+            
+            previewResult.className = 'alert alert-info';
+            previewResult.innerHTML = `
+                <strong>Tip ajustare:</strong> ${tipAjustare}<br>
+                <strong>Stoc inițial:</strong> ${stocActual} ${unitateMasura}<br>
+                <strong>Cantitate ajustată:</strong> ${cantitate} ${unitateMasura}<br>
+                <strong>Stoc final după ajustare:</strong> 
+                <span class="badge bg-${stocNou < 10 ? 'danger' : 'success'} p-1">${stocNou} ${unitateMasura}</span>
+            `;
+            
+            // Actualizează limita max pentru cantitate în cazul scăderii
+            if (!isPlus) {
+                cantitateInput.max = stocActual;
+                if (cantitate > stocActual) {
+                    cantitateInput.value = stocActual;
+                    updatePreview(); // Actualizează din nou previzualizarea
+                }
+            } else {
+                cantitateInput.max = 99999;
+            }
+        }
+        
+        // Verifică dacă există un produs deja selectat la încărcarea paginii
+        if (produsSelect.value) {
+            updateStockInfo();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalii Depozit - ContApp{% endblock %}
+
+{% block page_title %}Detalii Depozit{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('stocuri.editeaza_depozit', id=depozit.id) }}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Editează
+    </a>
+    <a href="{{ url_for('stocuri.depozite') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Lista Depozitelor
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informații Depozit</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">ID:</dt>
+                    <dd class="col-sm-8">{{ depozit.id }}</dd>
+                    
+                    <dt class="col-sm-4">Nume:</dt>
+                    <dd class="col-sm-8">{{ depozit.nume_depozit }}</dd>
+                    
+                    <dt class="col-sm-4">Adresă:</dt>
+                    <dd class="col-sm-8">{{ depozit.adresa or 'Nespecificat' }}</dd>
+                    
+                    <dt class="col-sm-4">Observații:</dt>
+                    <dd class="col-sm-8">{{ depozit.observatii or 'Nespecificat' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Produse în Depozit</h6>
+            </div>
+            <div class="card-body">
+                {% if stocuri %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Cod</th>
+                                <th>Produs</th>
+                                <th>Stoc Curent</th>
+                                <th>Acțiuni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stoc in stocuri %}
+                            <tr class="{{ 'table-danger' if stoc.stoc_curent < 10 }}">
+                                <td>{{ stoc.produs.cod }}</td>
+                                <td>{{ stoc.produs.nume }}</td>
+                                <td>
+                                    <span class="badge {{ 'bg-danger' if stoc.stoc_curent < 10 else 'bg-success' }}">
+                                        {{ stoc.stoc_curent }} {{ stoc.produs.unitate_masura }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('stocuri.vezi', id=stoc.produs.id) }}" class="btn btn-info btn-action">
+                                        <i class="fas fa-eye"></i> Vezi Produs
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle"></i> Nu există produse în acest depozit. 
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

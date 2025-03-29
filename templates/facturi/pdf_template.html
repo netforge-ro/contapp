@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factură {{ factura.serie }}{{ factura.numar }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            text-align: center;
+            font-size: 24pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .header-subtitle {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .info-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .info-column {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+            padding-right: 20px;
+        }
+        
+        .info-title {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #999;
+            padding-bottom: 5px;
+        }
+        
+        .info-row {
+            margin-bottom: 5px;
+        }
+        
+        .info-row strong {
+            display: inline-block;
+            width: 130px;
+            font-weight: bold;
+        }
+        
+        .invoice-details {
+            margin-bottom: 30px;
+            border: 1px solid #999;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        
+        .status-stamp {
+            position: absolute;
+            right: 50px;
+            top: 100px;
+            transform: rotate(-15deg);
+            font-size: 32pt;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: 5px solid;
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+        
+        .status-paid {
+            color: #008000;
+            border-color: #008000;
+        }
+        
+        .status-unpaid {
+            color: #CC0000;
+            border-color: #CC0000;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        table th, table td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        table tfoot tr td {
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .table-item-row:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .table-amount {
+            text-align: right;
+        }
+        
+        .table-total {
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        
+        .notes {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px dashed #999;
+            background-color: #f9f9f9;
+        }
+        
+        .notes h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14pt;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            border-top: 1px solid #999;
+            padding-top: 15px;
+            font-size: 9pt;
+            color: #666;
+        }
+        
+        .signatures {
+            margin-top: 70px;
+            display: table;
+            width: 100%;
+        }
+        
+        .signature-block {
+            display: table-cell;
+            width: 50%;
+            vertical-align: bottom;
+            padding: 10px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 50px;
+            padding-top: 5px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">FACTURĂ FISCALĂ</div>
+            <div class="header-subtitle">Seria {{ factura.serie }} Nr. {{ factura.numar }}</div>
+        </div>
+        
+        {% if factura.achitata %}
+        <div class="status-stamp status-paid">Achitată</div>
+        {% else %}
+        <div class="status-stamp status-unpaid">Neachitată</div>
+        {% endif %}
+        
+        <div class="info-section">
+            <div class="info-column">
+                <div class="info-title">Furnizor</div>
+                <div class="info-row">
+                    <strong>Denumire:</strong> SC CONTAPP SRL
+                </div>
+                <div class="info-row">
+                    <strong>CUI:</strong> RO12345678
+                </div>
+                <div class="info-row">
+                    <strong>Reg. Com.:</strong> J40/1234/2023
+                </div>
+                <div class="info-row">
+                    <strong>Adresă:</strong> Strada Exemplu, Nr. 123, București
+                </div>
+                <div class="info-row">
+                    <strong>Cont IBAN:</strong> RO49AAAA1B31007593840000
+                </div>
+                <div class="info-row">
+                    <strong>Bancă:</strong> Banca Exemplu
+                </div>
+            </div>
+            
+            <div class="info-column">
+                <div class="info-title">Client</div>
+                <div class="info-row">
+                    <strong>Denumire:</strong> {{ factura.client.nume }}
+                </div>
+                <div class="info-row">
+                    <strong>CUI:</strong> {{ factura.client.cui }}
+                </div>
+                <div class="info-row">
+                    <strong>Adresă:</strong> {{ factura.client.adresa }}{% if factura.client.oras %}, {{ factura.client.oras }}{% endif %}{% if factura.client.judet %}, {{ factura.client.judet }}{% endif %}
+                </div>
+                <div class="info-row">
+                    <strong>Telefon:</strong> {{ factura.client.telefon }}
+                </div>
+                <div class="info-row">
+                    <strong>Email:</strong> {{ factura.client.email }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="invoice-details">
+            <div class="info-row">
+                <strong>Data emiterii:</strong> {{ factura.data_emitere.strftime('%d.%m.%Y') }}
+            </div>
+            <div class="info-row">
+                <strong>Data scadenței:</strong> {{ factura.data_scadenta.strftime('%d.%m.%Y') }}
+            </div>
+            <div class="info-row">
+                <strong>Metodă plată:</strong> {{ factura.metoda_plata }}
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 35%;">Produs/Serviciu</th>
+                    <th style="width: 10%;">U.M.</th>
+                    <th style="width: 10%;">Cantitate</th>
+                    <th style="width: 10%;">Preț unitar</th>
+                    <th style="width: 10%;">Valoare</th>
+                    <th style="width: 10%;">TVA (%)</th>
+                    <th style="width: 10%;">Valoare TVA</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detaliu in factura.detalii %}
+                <tr class="table-item-row">
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td>{{ detaliu.produs.nume }}</td>
+                    <td class="text-center">{{ detaliu.produs.unitate_masura }}</td>
+                    <td class="table-amount">{{ detaliu.cantitate }}</td>
+                    <td class="table-amount">{{ detaliu.pret_unitar|round(2) }}</td>
+                    <td class="table-amount">{{ detaliu.valoare|round(2) }}</td>
+                    <td class="text-center">{{ detaliu.tva }}%</td>
+                    <td class="table-amount">{{ detaliu.valoare_tva|round(2) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-right">Subtotal:</td>
+                    <td colspan="3" class="table-amount">{{ (factura.valoare_totala - factura.valoare_tva)|round(2) }} Lei</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-right">Total TVA:</td>
+                    <td colspan="3" class="table-amount">{{ factura.valoare_tva|round(2) }} Lei</td>
+                </tr>
+                <tr class="table-total">
+                    <td colspan="5" class="text-right">Total de plată:</td>
+                    <td colspan="3" class="table-amount">{{ factura.valoare_totala|round(2) }} Lei</td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        {% if factura.observatii %}
+        <div class="notes">
+            <h3>Observații</h3>
+            <p>{{ factura.observatii }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="signatures">
+            <div class="signature-block">
+                <div class="signature-line">Furnizor (semnătură și ștampilă)</div>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line">Client (semnătură și ștampilă)</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Document valabil fără semnătură și ștampilă conform art. 319 alin. (29) din Legea nr. 227/2015 privind Codul Fiscal.</p>
+            <p>Factură generată prin ContApp - Sistem de Contabilitate.</p>
+        </div>
+    </div>
+</body>
+</html>

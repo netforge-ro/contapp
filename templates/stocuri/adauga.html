@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Adaugă Produs Nou - ContApp{% endblock %}
+
+{% block page_title %}Adaugă Produs Nou{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('stocuri.index') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Înapoi la Stocuri
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="cod" class="form-label">Cod Produs</label>
+                        <input type="text" class="form-control" id="cod" name="cod" maxlength="20">
+                        <small class="text-muted">Un cod unic pentru identificarea produsului</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="nume" class="form-label">Denumire Produs *</label>
+                        <input type="text" class="form-control" id="nume" name="nume" required maxlength="100">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="unitate_masura" class="form-label">Unitate de Măsură</label>
+                        <select class="form-select" id="unitate_masura" name="unitate_masura">
+                            <option value="buc">Bucată (buc)</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="l">Litru (l)</option>
+                            <option value="m">Metru (m)</option>
+                            <option value="mp">Metru pătrat (mp)</option>
+                            <option value="mc">Metru cub (mc)</option>
+                            <option value="set">Set</option>
+                            <option value="cutie">Cutie</option>
+                            <option value="pachet">Pachet</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stoc" class="form-label">Stoc Inițial</label>
+                        <input type="number" class="form-control" id="stoc" name="stoc" value="0" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="categorie_id" class="form-label">Categorie</label>
+                        <select class="form-select" id="categorie_id" name="categorie_id">
+                            <option value="">Selectează categoria</option>
+                            {% for categorie in categorii %}
+                            <option value="{{ categorie.id }}">{{ categorie.nume }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="pret_achizitie" class="form-label">Preț de Achiziție (Lei)</label>
+                        <input type="number" class="form-control" id="pret_achizitie" name="pret_achizitie" step="0.01" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="pret_vanzare" class="form-label">Preț de Vânzare (Lei)</label>
+                        <input type="number" class="form-control" id="pret_vanzare" name="pret_vanzare" step="0.01" min="0">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tva" class="form-label">TVA (%)</label>
+                        <input type="number" class="form-control" id="tva" name="tva" value="19" min="0" max="100">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="furnizor_id" class="form-label">Furnizor</label>
+                        <select class="form-select" id="furnizor_id" name="furnizor_id">
+                            <option value="">Selectează furnizorul</option>
+                            {% for furnizor in furnizori %}
+                            <option value="{{ furnizor.id }}">{{ furnizor.nume }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="activ" name="activ" checked>
+                        <label class="form-check-label" for="activ">Produs activ</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează Produs
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-calc vanzare price from achizitie + 20%
+        document.getElementById('pret_achizitie').addEventListener('input', function() {
+            const pretAchizitie = parseFloat(this.value) || 0;
+            const pretVanzare = pretAchizitie * 1.2; // Add 20% markup
+            document.getElementById('pret_vanzare').value = pretVanzare.toFixed(2);
+        });
+    });
+</script>
+{% endblock %}

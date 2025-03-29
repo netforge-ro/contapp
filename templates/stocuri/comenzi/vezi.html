@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalii Comandă - ContApp{% endblock %}
+
+{% block page_title %}Detalii Comandă #{{ comanda.id }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    {% if comanda.stare_comanda != 'Finalizată' and comanda.stare_comanda != 'Anulată' %}
+    <a href="{{ url_for('stocuri.editeaza_comanda', id=comanda.id) }}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Editează
+    </a>
+    {% endif %}
+    <a href="{{ url_for('stocuri.comenzi') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Lista Comenzilor
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informații Comandă</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">ID Comandă:</dt>
+                    <dd class="col-sm-7">{{ comanda.id }}</dd>
+                    
+                    <dt class="col-sm-5">Furnizor:</dt>
+                    <dd class="col-sm-7">
+                        <a href="{{ url_for('furnizori.vezi', id=comanda.furnizor.id) }}">
+                            {{ comanda.furnizor.nume }}
+                        </a>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Data Comandă:</dt>
+                    <dd class="col-sm-7">{{ comanda.data_comanda.strftime('%d-%m-%Y') }}</dd>
+                    
+                    <dt class="col-sm-5">Data Livrare:</dt>
+                    <dd class="col-sm-7">{{ comanda.data_livrare.strftime('%d-%m-%Y') if comanda.data_livrare else 'Nespecificat' }}</dd>
+                    
+                    <dt class="col-sm-5">Stare:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge 
+                            {% if comanda.stare_comanda == 'Nouă' %}bg-primary{% endif %}
+                            {% if comanda.stare_comanda == 'În procesare' %}bg-warning{% endif %}
+                            {% if comanda.stare_comanda == 'Finalizată' %}bg-success{% endif %}
+                            {% if comanda.stare_comanda == 'Anulată' %}bg-danger{% endif %}">
+                            {{ comanda.stare_comanda }}
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-5">Observații:</dt>
+                    <dd class="col-sm-7">{{ comanda.observatii or 'Nespecificat' }}</dd>
+                </dl>
+            </div>
+        </div>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Plăți Asociate</h6>
+            </div>
+            <div class="card-body">
+                {% if comanda.plati %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Data</th>
+                                <th>Valoare</th>
+                                <th>Acțiuni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plata in comanda.plati %}
+                            <tr>
+                                <td>{{ plata.id }}</td>
+                                <td>{{ plata.data_platii.strftime('%d-%m-%Y') }}</td>
+                                <td>{{ plata.valoare|round(2) }} Lei</td>
+                                <td>
+                                    <a href="{{ url_for('stocuri.vezi_plata', id=plata.id) }}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle"></i> Nu există plăți asociate acestei comenzi.
+                    <a href="{{ url_for('stocuri.adauga_plata') }}" class="alert-link">Adaugă o plată</a>.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Produse Comandate</h6>
+            </div>
+            <div class="card-body">
+                {% if produse_comandate %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Cod</th>
+                                <th>Produs</th>
+                                <th>Cantitate</th>
+                                <th>Acțiuni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produs_comandat in produse_comandate %}
+                            <tr>
+                                <td>{{ produs_comandat.produs.cod }}</td>
+                                <td>{{ produs_comandat.produs.nume }}</td>
+                                <td>{{ produs_comandat.cantitate_comandata }} {{ produs_comandat.produs.unitate_masura }}</td>
+                                <td>
+                                    <a href="{{ url_for('stocuri.vezi', id=produs_comandat.produs.id) }}" class="btn btn-info btn-action">
+                                        <i class="fas fa-eye"></i> Vezi Produs
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle"></i> Nu există produse în această comandă.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

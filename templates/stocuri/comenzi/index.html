@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Comenzi - ContApp{% endblock %}
+
+{% block page_title %}Gestionare Comenzi{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('stocuri.adauga_comanda') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Comandă Nouă
+    </a>
+    <a href="{{ url_for('stocuri.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Stocuri
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Lista Comenzilor</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Furnizor</th>
+                        <th>Data Comandă</th>
+                        <th>Data Livrare</th>
+                        <th>Stare</th>
+                        <th>Nr. Produse</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comanda in comenzi %}
+                    <tr>
+                        <td>{{ comanda.id }}</td>
+                        <td>{{ comanda.furnizor.nume }}</td>
+                        <td>{{ comanda.data_comanda.strftime('%d-%m-%Y') }}</td>
+                        <td>{{ comanda.data_livrare.strftime('%d-%m-%Y') if comanda.data_livrare else 'Nespecificat' }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if comanda.stare_comanda == 'Nouă' %}bg-primary{% endif %}
+                                {% if comanda.stare_comanda == 'În procesare' %}bg-warning{% endif %}
+                                {% if comanda.stare_comanda == 'Finalizată' %}bg-success{% endif %}
+                                {% if comanda.stare_comanda == 'Anulată' %}bg-danger{% endif %}">
+                                {{ comanda.stare_comanda }}
+                            </span>
+                        </td>
+                        <td>{{ comanda.produse_comandate|length }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('stocuri.vezi_comanda', id=comanda.id) }}" class="btn btn-info btn-action">
+                                    <i class="fas fa-eye"></i> Vezi
+                                </a>
+                                {% if comanda.stare_comanda != 'Finalizată' and comanda.stare_comanda != 'Anulată' %}
+                                <a href="{{ url_for('stocuri.editeaza_comanda', id=comanda.id) }}" class="btn btn-warning btn-action">
+                                    <i class="fas fa-edit"></i> Editează
+                                </a>
+                                <button type="button" class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#stergeComandaModal{{ comanda.id }}">
+                                    <i class="fas fa-trash"></i> Șterge
+                                </button>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Modal Șterge Comandă -->
+                            <div class="modal fade" id="stergeComandaModal{{ comanda.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmă Ștergerea</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Ești sigur că dorești să ștergi comanda <strong>#{{ comanda.id }}</strong> către furnizorul <strong>{{ comanda.furnizor.nume }}</strong>?</p>
+                                            <p class="text-danger">Această acțiune nu poate fi anulată!</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anulează</button>
+                                            <form action="{{ url_for('stocuri.sterge_comanda', id=comanda.id) }}" method="POST">
+                                                <button type="submit" class="btn btn-danger">Șterge Definitiv</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if not comenzi %}
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle"></i> Nu există comenzi înregistrate. 
+            <a href="{{ url_for('stocuri.adauga_comanda') }}" class="alert-link">Adaugă prima comandă</a>.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

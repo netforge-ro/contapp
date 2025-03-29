@@ -30,6 +30,7 @@ instance/
 # Local configuration
 .idea/
 .vscode/
+app/config.py
 
 # Cache
 .mypy_cache/

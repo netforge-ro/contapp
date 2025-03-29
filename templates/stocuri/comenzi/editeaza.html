@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Editează Comandă - ContApp{% endblock %}
+
+{% block page_title %}Editează Comandă #{{ comanda.id }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('stocuri.vezi_comanda', id=comanda.id) }}" class="btn btn-info">
+        <i class="fas fa-eye"></i> Vezi Detalii
+    </a>
+    <a href="{{ url_for('stocuri.comenzi') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Lista Comenzilor
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Detalii Comandă</h6>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('stocuri.editeaza_comanda', id=comanda.id) }}">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="furnizor_id" class="form-label">Furnizor <span class="text-danger">*</span></label>
+                        <select class="form-select" id="furnizor_id" name="furnizor_id" required>
+                            <option value="">-- Selectează furnizor --</option>
+                            {% for furnizor in furnizori %}
+                            <option value="{{ furnizor.id }}" {% if furnizor.id == comanda.furnizor_id %}selected{% endif %}>
+                                {{ furnizor.nume }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="stare_comanda" class="form-label">Stare Comandă</label>
+                        <select class="form-select" id="stare_comanda" name="stare_comanda">
+                            <option value="Nouă" {% if comanda.stare_comanda == 'Nouă' %}selected{% endif %}>Nouă</option>
+                            <option value="În procesare" {% if comanda.stare_comanda == 'În procesare' %}selected{% endif %}>În procesare</option>
+                            <option value="Finalizată" {% if comanda.stare_comanda == 'Finalizată' %}selected{% endif %}>Finalizată</option>
+                            <option value="Anulată" {% if comanda.stare_comanda == 'Anulată' %}selected{% endif %}>Anulată</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="data_comanda" class="form-label">Data Comandă <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="data_comanda" name="data_comanda" 
+                               value="{{ comanda.data_comanda.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="data_livrare" class="form-label">Data Livrare Estimată</label>
+                        <input type="date" class="form-control" id="data_livrare" name="data_livrare"
+                               value="{{ comanda.data_livrare.strftime('%Y-%m-%d') if comanda.data_livrare else '' }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="observatii" class="form-label">Observații</label>
+                <textarea class="form-control" id="observatii" name="observatii" rows="3">{{ comanda.observatii }}</textarea>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="mb-3">
+                <h5>Produse Comandate</h5>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Pentru a modifica produsele comandate, vă rugăm să creați o nouă comandă.
+                    Produsele din comanda curentă sunt afișate doar cu scop informativ.
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="produseTable">
+                        <thead>
+                            <tr>
+                                <th>Produs</th>
+                                <th>Cantitate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produs_comandat in produse_comandate %}
+                            <tr>
+                                <td>
+                                    {{ produs_comandat.produs.cod }} - {{ produs_comandat.produs.nume }}
+                                </td>
+                                <td>
+                                    {{ produs_comandat.cantitate_comandata }} {{ produs_comandat.produs.unitate_masura }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end mt-4">
+                <button type="button" class="btn btn-secondary me-2" onclick="window.history.back();">Anulează</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează Modificările
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

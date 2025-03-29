@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalii Plată - ContApp{% endblock %}
+
+{% block page_title %}Detalii Plată #{{ plata.id }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('stocuri.editeaza_plata', id=plata.id) }}" class="btn btn-warning">
+        <i class="fas fa-edit"></i> Editează
+    </a>
+    <a href="{{ url_for('stocuri.plati') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Lista Plăților
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informații Plată</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">ID Plată:</dt>
+                    <dd class="col-sm-8">{{ plata.id }}</dd>
+                    
+                    <dt class="col-sm-4">Comandă:</dt>
+                    <dd class="col-sm-8">
+                        <a href="{{ url_for('stocuri.vezi_comanda', id=plata.comanda.id) }}">
+                            #{{ plata.comanda.id }}
+                        </a>
+                    </dd>
+                    
+                    <dt class="col-sm-4">Furnizor:</dt>
+                    <dd class="col-sm-8">
+                        <a href="{{ url_for('furnizori.vezi', id=plata.comanda.furnizor.id) }}">
+                            {{ plata.comanda.furnizor.nume }}
+                        </a>
+                    </dd>
+                    
+                    <dt class="col-sm-4">Data Plății:</dt>
+                    <dd class="col-sm-8">{{ plata.data_platii.strftime('%d-%m-%Y') }}</dd>
+                    
+                    <dt class="col-sm-4">Valoare:</dt>
+                    <dd class="col-sm-8"><strong>{{ plata.valoare|round(2) }} Lei</strong></dd>
+                    
+                    <dt class="col-sm-4">Modalitate Plată:</dt>
+                    <dd class="col-sm-8">{{ plata.modalitate_plata }}</dd>
+                    
+                    <dt class="col-sm-4">Observații:</dt>
+                    <dd class="col-sm-8">{{ plata.observatii or 'Nespecificat' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Detalii Comandă Asociată</h6>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">ID Comandă:</dt>
+                    <dd class="col-sm-8">
+                        <a href="{{ url_for('stocuri.vezi_comanda', id=plata.comanda.id) }}">
+                            #{{ plata.comanda.id }}
+                        </a>
+                    </dd>
+                    
+                    <dt class="col-sm-4">Data Comandă:</dt>
+                    <dd class="col-sm-8">{{ plata.comanda.data_comanda.strftime('%d-%m-%Y') }}</dd>
+                    
+                    <dt class="col-sm-4">Data Livrare:</dt>
+                    <dd class="col-sm-8">{{ plata.comanda.data_livrare.strftime('%d-%m-%Y') if plata.comanda.data_livrare else 'Nespecificat' }}</dd>
+                    
+                    <dt class="col-sm-4">Stare Comandă:</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge 
+                            {% if plata.comanda.stare_comanda == 'Nouă' %}bg-primary{% endif %}
+                            {% if plata.comanda.stare_comanda == 'În procesare' %}bg-warning{% endif %}
+                            {% if plata.comanda.stare_comanda == 'Finalizată' %}bg-success{% endif %}
+                            {% if plata.comanda.stare_comanda == 'Anulată' %}bg-danger{% endif %}">
+                            {{ plata.comanda.stare_comanda }}
+                        </span>
+                    </dd>
+                </dl>
+                
+                <div class="mt-3">
+                    <h6 class="font-weight-bold">Produse Comandate</h6>
+                    <ul class="list-group">
+                        {% for produs_comandat in plata.comanda.produse_comandate %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ produs_comandat.produs.nume }}
+                            <span class="badge bg-primary rounded-pill">
+                                {{ produs_comandat.cantitate_comandata }} {{ produs_comandat.produs.unitate_masura }}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

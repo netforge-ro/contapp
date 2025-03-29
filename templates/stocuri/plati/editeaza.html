@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Editează Plată - ContApp{% endblock %}
+
+{% block page_title %}Editează Plată #{{ plata.id }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('stocuri.vezi_plata', id=plata.id) }}" class="btn btn-info">
+        <i class="fas fa-eye"></i> Vezi Detalii
+    </a>
+    <a href="{{ url_for('stocuri.plati') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Înapoi la Lista Plăților
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Detalii Plată</h6>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('stocuri.editeaza_plata', id=plata.id) }}">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="comanda_id" class="form-label">Comandă <span class="text-danger">*</span></label>
+                        <select class="form-select" id="comanda_id" name="comanda_id" required>
+                            <option value="">-- Selectează comandă --</option>
+                            {% for comanda in comenzi %}
+                            <option value="{{ comanda.id }}" 
+                                    data-furnizor="{{ comanda.furnizor.nume }}"
+                                    {% if comanda.id == plata.comanda_id %}selected{% endif %}>
+                                #{{ comanda.id }} - {{ comanda.furnizor.nume }} ({{ comanda.data_comanda.strftime('%d-%m-%Y') }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div id="comandaInfo" class="form-text text-info mt-2">
+                            Plata este asociată comenzii #{{ plata.comanda.id }} de la furnizorul {{ plata.comanda.furnizor.nume }}.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="modalitate_plata" class="form-label">Modalitate Plată</label>
+                        <select class="form-select" id="modalitate_plata" name="modalitate_plata">
+                            <option value="Transfer bancar" {% if plata.modalitate_plata == 'Transfer bancar' %}selected{% endif %}>Transfer bancar</option>
+                            <option value="Card" {% if plata.modalitate_plata == 'Card' %}selected{% endif %}>Card</option>
+                            <option value="Numerar" {% if plata.modalitate_plata == 'Numerar' %}selected{% endif %}>Numerar</option>
+                            <option value="Bilet la ordin" {% if plata.modalitate_plata == 'Bilet la ordin' %}selected{% endif %}>Bilet la ordin</option>
+                            <option value="CEC" {% if plata.modalitate_plata == 'CEC' %}selected{% endif %}>CEC</option>
+                            <option value="Altă modalitate" {% if plata.modalitate_plata == 'Altă modalitate' %}selected{% endif %}>Altă modalitate</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="data_platii" class="form-label">Data Plății <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="data_platii" name="data_platii" 
+                               value="{{ plata.data_platii.strftime('%Y-%m-%d') }}" required>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="valoare" class="form-label">Valoare <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="valoare" name="valoare" 
+                                   step="0.01" min="0.01" value="{{ plata.valoare }}" required>
+                            <span class="input-group-text">Lei</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="observatii" class="form-label">Observații</label>
+                <textarea class="form-control" id="observatii" name="observatii" rows="3">{{ plata.observatii }}</textarea>
+                <div class="form-text">Referințe, documente justificative sau alte informații relevante.</div>
+            </div>
+            
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary me-2" onclick="window.history.back();">Anulează</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvează Modificările
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Funcția pentru actualizarea informațiilor despre comandă
+        const comandaSelect = document.getElementById('comanda_id');
+        const comandaInfo = document.getElementById('comandaInfo');
+        
+        comandaSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            
+            if (this.value) {
+                const furnizor = selectedOption.dataset.furnizor;
+                comandaInfo.textContent = `Plata va fi asociată comenzii #${this.value} de la furnizorul ${furnizor}.`;
+            } else {
+                comandaInfo.textContent = '';
+            }
+        });
+    });
+</script>
+{% endblock %}

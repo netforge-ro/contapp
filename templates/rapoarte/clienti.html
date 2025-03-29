@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+
+{% block title %}Raport Clienți - ContApp{% endblock %}
+
+{% block page_title %}Raport Clienți{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('rapoarte.index') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Înapoi la Rapoarte
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Distribuție Facturi Neachitate per Client</h6>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="chartFacturiNeachitate"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Top Clienți după Vânzări</h6>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="chartTopClienti"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Activitate Clienți</h6>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px;">
+                    <canvas id="chartActivitateClienti"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Situație Clienți</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nume Client</th>
+                        <th>CUI</th>
+                        <th>Contacte</th>
+                        <th>Sold Neachitat</th>
+                        <th>Status</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clienti %}
+                    <tr>
+                        <td>{{ client.nume }}</td>
+                        <td>{{ client.cui }}</td>
+                        <td>
+                            {% if client.telefon %}Tel: {{ client.telefon }}{% endif %}
+                            {% if client.email %}<br>Email: {{ client.email }}{% endif %}
+                        </td>
+                        <td>{{ facturi_neachitate[client.id]|round(2) }} Lei</td>
+                        <td>
+                            {% if client.activ %}
+                            <span class="badge bg-success">Activ</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactiv</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('clienti.vezi', id=client.id) }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Top 5 clienți cu facturi neachitate
+        {% set top_clienti_neachitat = [] %}
+        {% set sume_neachitate = [] %}
+        
+        {% set counter = namespace(value=0) %}
+        {% for client in clienti %}
+            {% if facturi_neachitate[client.id] > 0 and counter.value < 5 %}
+                {% set _ = top_clienti_neachitat.append(client.nume) %}
+                {% set _ = sume_neachitate.append(facturi_neachitate[client.id]) %}
+                {% set counter.value = counter.value + 1 %}
+            {% endif %}
+        {% endfor %}
+        
+        // Top 5 clienți după vânzări totale (simulare pentru exemplu)
+        const topClienti = ['Client A', 'Client B', 'Client C', 'Client D', 'Client E'];
+        const topSume = [25000, 18500, 15000, 12500, 10000];
+        
+        // Activitate lunară (simulare pentru exemplu)
+        const lunile = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const nrClientiActivi = [5, 7, 8, 10, 12, 15, 14, 12, 15, 18, 20, 22];
+        const nrFacturiEmise = [10, 15, 20, 25, 30, 35, 32, 28, 40, 45, 50, 55];
+        
+        // Create Chart 1: Distribuție Facturi Neachitate
+        const ctxNeachitate = document.getElementById('chartFacturiNeachitate');
+        if (ctxNeachitate) {
+            const chartFacturiNeachitate = new Chart(ctxNeachitate, {
+                type: 'pie',
+                data: {
+                    labels: {{ top_clienti_neachitat|tojson }},
+                    datasets: [{
+                        data: {{ sume_neachitate|tojson }},
+                        backgroundColor: [
+                            'rgba(25, 118, 210, 0.8)',
+                            'rgba(245, 124, 0, 0.8)',
+                            'rgba(56, 142, 60, 0.8)',
+                            'rgba(211, 47, 47, 0.8)',
+                            'rgba(123, 31, 162, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(25, 118, 210, 1)',
+                            'rgba(245, 124, 0, 1)',
+                            'rgba(56, 142, 60, 1)',
+                            'rgba(211, 47, 47, 1)',
+                            'rgba(123, 31, 162, 1)'
+                        ],
+                        borderWidth: 1,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 25, 41, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += parseFloat(context.raw).toFixed(2) + ' Lei';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Create Chart 2: Top Clienți
+        const ctxTopClienti = document.getElementById('chartTopClienti');
+        if (ctxTopClienti) {
+            const chartTopClienti = new Chart(ctxTopClienti, {
+                type: 'bar',
+                data: {
+                    labels: topClienti,
+                    datasets: [{
+                        label: 'Vânzări Totale',
+                        data: topSume,
+                        backgroundColor: 'rgba(25, 118, 210, 0.8)',
+                        borderColor: 'rgba(25, 118, 210, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 25, 41, 0.9)',
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += parseFloat(context.raw).toFixed(2) + ' Lei';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Create Chart 3: Activitate Clienți
+        const ctxActivitate = document.getElementById('chartActivitateClienti');
+        if (ctxActivitate) {
+            const chartActivitateClienti = new Chart(ctxActivitate, {
+                type: 'bar',
+                data: {
+                    labels: lunile,
+                    datasets: [
+                        {
+                            label: 'Clienți Activi',
+                            data: nrClientiActivi,
+                            backgroundColor: 'rgba(25, 118, 210, 0.8)',
+                            borderColor: 'rgba(25, 118, 210, 1)',
+                            borderWidth: 1,
+                            order: 2
+                        },
+                        {
+                            label: 'Facturi Emise',
+                            data: nrFacturiEmise,
+                            type: 'line',
+                            fill: false,
+                            borderColor: 'rgba(211, 47, 47, 1)',
+                            backgroundColor: 'rgba(211, 47, 47, 0.8)',
+                            pointBackgroundColor: 'rgba(211, 47, 47, 1)',
+                            pointBorderColor: '#fff',
+                            pointRadius: 4,
+                            borderWidth: 2,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 25, 41, 0.9)'
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
