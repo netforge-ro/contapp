@@ -10,8 +10,22 @@
             margin: 2cm;
         }
         
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/dejavu-fonts/2.37/DejaVuSans.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/dejavu-fonts/2.37/DejaVuSans-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'DejaVu Sans', 'Noto Sans', Arial, sans-serif;
             font-size: 11pt;
             line-height: 1.5;
             color: #333;
@@ -27,36 +41,30 @@
         }
         
         .header {
-            border-bottom: 2px solid #333;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            text-align: center;
         }
         
         .header-title {
-            text-align: center;
             font-size: 24pt;
             font-weight: bold;
             margin-bottom: 5px;
         }
         
         .header-subtitle {
-            text-align: center;
             font-size: 16pt;
             font-weight: bold;
-            margin-bottom: 20px;
         }
         
         .info-section {
-            display: table;
             width: 100%;
             margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
         }
         
         .info-column {
-            display: table-cell;
-            width: 50%;
-            vertical-align: top;
-            padding-right: 20px;
+            width: 48%;
         }
         
         .info-title {
@@ -82,29 +90,12 @@
             border: 1px solid #999;
             padding: 15px;
             background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
         }
         
-        .status-stamp {
-            position: absolute;
-            right: 50px;
-            top: 100px;
-            transform: rotate(-15deg);
-            font-size: 32pt;
-            font-weight: bold;
-            padding: 10px 20px;
-            border: 5px solid;
-            opacity: 0.5;
-            text-transform: uppercase;
-        }
-        
-        .status-paid {
-            color: #008000;
-            border-color: #008000;
-        }
-        
-        .status-unpaid {
-            color: #CC0000;
-            border-color: #CC0000;
+        .detail-column {
+            width: 30%;
         }
         
         table {
@@ -174,22 +165,21 @@
         
         .signatures {
             margin-top: 70px;
-            display: table;
+            display: flex;
+            justify-content: space-between;
             width: 100%;
         }
         
         .signature-block {
-            display: table-cell;
-            width: 50%;
-            vertical-align: bottom;
-            padding: 10px;
+            width: 45%;
+            text-align: center;
         }
         
         .signature-line {
             border-top: 1px solid #333;
             margin-top: 50px;
             padding-top: 5px;
-            width: 80%;
+            width: 100%;
         }
     </style>
 </head>
@@ -199,12 +189,6 @@
             <div class="header-title">FACTURĂ FISCALĂ</div>
             <div class="header-subtitle">Seria {{ factura.serie }} Nr. {{ factura.numar }}</div>
         </div>
-        
-        {% if factura.achitata %}
-        <div class="status-stamp status-paid">Achitată</div>
-        {% else %}
-        <div class="status-stamp status-unpaid">Neachitată</div>
-        {% endif %}
         
         <div class="info-section">
             <div class="info-column">
@@ -250,13 +234,13 @@
         </div>
         
         <div class="invoice-details">
-            <div class="info-row">
+            <div class="detail-column">
                 <strong>Data emiterii:</strong> {{ factura.data_emitere.strftime('%d.%m.%Y') }}
             </div>
-            <div class="info-row">
+            <div class="detail-column">
                 <strong>Data scadenței:</strong> {{ factura.data_scadenta.strftime('%d.%m.%Y') }}
             </div>
-            <div class="info-row">
+            <div class="detail-column">
                 <strong>Metodă plată:</strong> {{ factura.metoda_plata }}
             </div>
         </div>

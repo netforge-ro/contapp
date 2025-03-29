@@ -130,8 +130,23 @@
             margin: 2cm;
         }
         
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/dejavu-fonts/2.37/DejaVuSans.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/dejavu-fonts/2.37/DejaVuSans-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+        
         body * {
             visibility: hidden;
+            font-family: 'DejaVu Sans', 'Noto Sans', Arial, sans-serif;
         }
         
         .print-area, .print-area * {
@@ -148,11 +163,44 @@
             left: 0;
             top: 0;
             width: 100%;
+            padding: 2cm;
+        }
+        
+        /* Enhanced styling for printed document */
+        .print-area h4 {
+            font-size: 24pt;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .print-area .mb-3:nth-child(2) {
+            font-size: 16pt;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .print-area .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .print-area .col-md-6 {
+            width: 48%;
+        }
+        
+        .print-area .col-md-6 h5 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #999;
+            padding-bottom: 5px;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 30px;
         }
         
         table th, table td {
@@ -181,6 +229,24 @@
         /* Print footers on each page */
         tfoot {
             display: table-footer-group;
+        }
+        
+        /* Add signature lines */
+        .print-area:after {
+            content: "";
+            display: block;
+            margin-top: 70px;
+        }
+        
+        /* Footer styling */
+        .print-area:after {
+            content: "Document valabil fără semnătură și ștampilă conform art. 319 alin. (29) din Legea nr. 227/2015 privind Codul Fiscal.";
+            display: block;
+            margin-top: 100px;
+            font-size: 9pt;
+            color: #666;
+            border-top: 1px solid #999;
+            padding-top: 15px;
         }
     }
 </style>
