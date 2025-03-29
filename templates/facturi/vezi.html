@@ -130,9 +130,14 @@
             margin: 2cm;
         }
         
+        @font-face {
+            font-family: 'Roboto';
+            src: url('{{ url_for("static", filename="font/Roboto-VariableFont.ttf") }}') format('truetype');
+        }
+        
         body * {
             visibility: hidden;
-            font-family: Arial, sans-serif;
+            font-family: Roboto, Arial, sans-serif;
         }
         
         .print-area, .print-area * {
