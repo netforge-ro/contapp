@@ -223,19 +223,13 @@ def pdf(id):
     # Create a file-like buffer to receive PDF data
     pdf_buffer = io.BytesIO()
     
-    # Set up font paths for pisa
-    import os
-    font_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'font')
-    css = '@font-face {font-family: Roboto; src: url(' + font_dir + '/Roboto-VariableFont.ttf)}'
-    
     # Generate PDF from HTML
     try:
         # Convert HTML to PDF and write to buffer
         pisa_status = pisa.CreatePDF(
             html,                   # HTML source
             dest=pdf_buffer,        # Output file handle
-            encoding='UTF-8',       # Encoding
-            default_css=css         # Custom CSS with font definition
+            encoding='UTF-8'        # Encoding
         )
         
         # Rewind the buffer to the beginning
