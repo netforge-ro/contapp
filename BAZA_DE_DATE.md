@@ -6,6 +6,9 @@
 
 1. [Introducere](#introducere)
 2. [Schema Bazei de Date](#schema-bazei-de-date)
+   - [Diagrama Relațională](#diagrama-relațională)
+   - [Diagrama Entitate-Relație](#diagrama-entitate-relație)
+   - [Schema Logică](#schema-logică)
 3. [Descrierea Tabelelor](#descrierea-tabelelor)
 4. [Relații între Tabele](#relații-între-tabele)
 5. [Accesarea și Gestionarea Bazei de Date cu pgAdmin](#accesarea-și-gestionarea-bazei-de-date-cu-pgadmin)
@@ -25,35 +28,46 @@ Datele sunt organizate în tabele interconectate prin relații de tip "cheie pri
 
 ## Schema Bazei de Date
 
+Baza de date `contapp` este structurată conform modelului entitate-relație prezentat în diagramele de mai jos.
+
+### Diagrama Relațională
+
+![Diagrama Relațională](/var/www-tools/proiect-sifc/01.schema-relationala.jpg)
+
+Diagrama relațională prezintă structura tabelelor din baza de date și conexiunile dintre acestea. Structura include entități pentru furnizori, produse, facturi, comenzi, plăți, depozite și stocuri. Cheile primare (CP) și cheile străine (CS) sunt evidențiate pentru a ilustra relațiile dintre tabele.
+
+### Diagrama Entitate-Relație
+
+![Diagrama Entitate-Relație](/var/www-tools/proiect-sifc/02.diagrama-entitate-relatie.jpg)
+
+Diagrama entitate-relație ilustrează legăturile logice dintre diferitele entități din sistem și cardinalitatea acestora (1:1, 1:M, 0:M). Relațiile cheie includ:
+- Furnizor EMITE Factură (1:1)
+- Furnizor PRIMEȘTE Comandă (1:M)
+- Comandă NECESITĂ Plată (1:M)
+- Produs ESTE ÎN STOC Depozit (0:M)
+- Comandă CONȚINE Produs (1:M)
+
+### Schema Logică
+
+![Schema Logică](/var/www-tools/proiect-sifc/03.schema-logica.jpg)
+
+Schema logică detaliază entitățile ca tabele parentale și copii, cu relațiile specificate explicit între acestea (emite, primește, necesită, este în stoc, etc.). Această reprezentare ajută la înțelegerea fluxului de date și a dependențelor dintre componentele sistemului.
+
 Baza de date `contapp` conține următoarele tabele principale:
 
-- `clienti` - Informații despre clienți
 - `furnizori` - Informații despre furnizori
-- `categorii_produse_cheltuieli` - Categorii pentru produse și cheltuieli
 - `produse` - Catalogul de produse și servicii
-- `facturi` - Facturile emise către clienți
+- `facturi` - Facturile emise de furnizori
+- `comenzi` - Comenzile plasate către furnizori
+- `plati` - Plățile efectuate pentru comenzi
+- `depozite` - Informații despre locațiile de depozitare
+- `stocuri` - Stocurile curente de produse
+- `produse_comandate` - Produsele incluse în comenzi
+- `categorii_produse_cheltuieli` - Categorii pentru produse și cheltuieli
 - `detalii_facturi` - Liniile de produse din facturi
-- `facturi_primite` - Facturile primite de la furnizori
 - `miscari_stoc` - Mișcările de stoc (intrări, ieșiri, ajustări)
 
 ## Descrierea Tabelelor
-
-### Tabelul `clienti`
-
-Stochează informațiile despre clienții companiei.
-
-| Coloană | Tip | Descriere |
-|---------|-----|-----------|
-| id | Integer | Identificator unic (cheie primară) |
-| nume | String(100) | Denumirea clientului |
-| cui | String(20) | Codul Unic de Identificare (CUI/CIF) |
-| adresa | String(255) | Adresa clientului |
-| oras | String(100) | Orașul |
-| judet | String(100) | Județul |
-| telefon | String(20) | Număr de telefon |
-| email | String(100) | Adresa de email |
-| data_adaugare | DateTime | Data adăugării în sistem |
-| activ | Boolean | Indicator pentru starea clientului |
 
 ### Tabelul `furnizori`
 
@@ -65,22 +79,12 @@ Stochează informațiile despre furnizorii companiei.
 | nume | String(100) | Denumirea furnizorului |
 | cui | String(20) | Codul Unic de Identificare (CUI/CIF) |
 | adresa | String(255) | Adresa furnizorului |
-| oras | String(100) | Orașul |
-| judet | String(100) | Județul |
 | telefon | String(20) | Număr de telefon |
-| email | String(100) | Adresa de email |
+| cod_fiscal | String(20) | Codul fiscal al furnizorului |
+| cont_bancar | String(50) | Contul bancar |
+| sold_furnizor | Numeric(10,2) | Soldul curent al furnizorului |
 | data_adaugare | DateTime | Data adăugării în sistem |
 | activ | Boolean | Indicator pentru starea furnizorului |
-
-### Tabelul `categorii_produse_cheltuieli`
-
-Categorii pentru produse și cheltuieli pentru o mai bună organizare.
-
-| Coloană | Tip | Descriere |
-|---------|-----|-----------|
-| id | Integer | Identificator unic (cheie primară) |
-| nume | String(100) | Denumirea categoriei |
-| descriere | Text | Descrierea categoriei |
 
 ### Tabelul `produse`
 
@@ -91,34 +95,100 @@ Catalogul de produse și servicii oferite sau achiziționate.
 | id | Integer | Identificator unic (cheie primară) |
 | cod | String(20) | Codul produsului (unic) |
 | nume | String(100) | Denumirea produsului |
-| descriere | Text | Descrierea produsului |
-| pret_achizitie | Numeric(10,2) | Prețul de achiziție |
-| pret_vanzare | Numeric(10,2) | Prețul de vânzare |
-| stoc | Integer | Cantitatea disponibilă în stoc |
 | unitate_masura | String(20) | Unitatea de măsură (buc, kg, etc.) |
-| tva | Integer | Cota de TVA aplicabilă (%) |
+| pret | Numeric(10,2) | Prețul produsului |
+| stoc | Integer | Cantitatea disponibilă în stoc |
+| cod_comanda | Integer | Legătura cu tabela comenzi (cheie străină) |
 | data_adaugare | DateTime | Data adăugării în sistem |
 | activ | Boolean | Indicator pentru starea produsului |
 | categorie_id | Integer | Legătura cu tabela categorii (cheie străină) |
-| furnizor_id | Integer | Legătura cu tabela furnizori (cheie străină) |
 
 ### Tabelul `facturi`
 
-Facturile emise către clienți.
+Facturile emise de furnizori.
 
 | Coloană | Tip | Descriere |
 |---------|-----|-----------|
 | id | Integer | Identificator unic (cheie primară) |
-| serie | String(10) | Seria facturii |
-| numar | Integer | Numărul facturii |
-| data_emitere | Date | Data emiterii facturii |
+| data_factura | Date | Data emiterii facturii |
+| serie_factura | String(10) | Seria facturii |
+| nr_factura | Integer | Numărul facturii |
 | data_scadenta | Date | Data scadenței pentru plată |
-| valoare_totala | Numeric(10,2) | Valoarea totală a facturii (cu TVA) |
-| valoare_tva | Numeric(10,2) | Valoarea TVA-ului |
-| achitata | Boolean | Indicator pentru starea plății |
-| metoda_plata | String(50) | Metoda de plată |
+| valoare | Numeric(10,2) | Valoarea totală a facturii |
+| modalitate_plata | String(50) | Metoda de plată |
+| furnizor_id | Integer | Legătura cu tabela furnizori (cheie străină) |
 | observatii | Text | Observații sau note |
-| client_id | Integer | Legătura cu tabela clienți (cheie străină) |
+
+### Tabelul `comenzi`
+
+Comenzile plasate către furnizori.
+
+| Coloană | Tip | Descriere |
+|---------|-----|-----------|
+| id | Integer | Identificator unic (cheie primară) |
+| data_comanda | Date | Data plasării comenzii |
+| data_livrare | Date | Data de livrare programată |
+| stare_comanda | String(50) | Starea curentă a comenzii |
+| furnizor_id | Integer | Legătura cu tabela furnizori (cheie străină) |
+| observatii | Text | Observații sau note |
+
+### Tabelul `plati`
+
+Evidența plăților efectuate pentru comenzi.
+
+| Coloană | Tip | Descriere |
+|---------|-----|-----------|
+| id | Integer | Identificator unic (cheie primară) |
+| data_platii | Date | Data efectuării plății |
+| valoare | Numeric(10,2) | Suma plătită |
+| modalitate_plata | String(50) | Metoda de plată |
+| comanda_id | Integer | Legătura cu tabela comenzi (cheie străină) |
+| observatii | Text | Observații sau note |
+
+### Tabelul `depozite`
+
+Informații despre locațiile de depozitare.
+
+| Coloană | Tip | Descriere |
+|---------|-----|-----------|
+| id | Integer | Identificator unic (cheie primară) |
+| nume_depozit | String(100) | Denumirea depozitului |
+| adresa | String(255) | Adresa depozitului |
+| observatii | Text | Observații sau note |
+
+### Tabelul `stocuri`
+
+Stocurile curente de produse în depozite.
+
+| Coloană | Tip | Descriere |
+|---------|-----|-----------|
+| id | Integer | Identificator unic |
+| depozit_id | Integer | Legătura cu tabela depozite (cheie primară, cheie străină) |
+| produs_id | Integer | Legătura cu tabela produse (cheie primară, cheie străină) |
+| stoc_curent | Integer | Cantitatea disponibilă în stoc |
+| observatii | Text | Observații sau note |
+
+### Tabelul `produse_comandate`
+
+Produsele incluse în comenzi.
+
+| Coloană | Tip | Descriere |
+|---------|-----|-----------|
+| id | Integer | Identificator unic |
+| produs_id | Integer | Legătura cu tabela produse (cheie primară, cheie străină) |
+| comanda_id | Integer | Legătura cu tabela comenzi (cheie primară, cheie străină) |
+| cantitate_comandata | Integer | Cantitatea comandată |
+| observatii | Text | Observații sau note |
+
+### Tabelul `categorii_produse_cheltuieli`
+
+Categorii pentru produse și cheltuieli pentru o mai bună organizare.
+
+| Coloană | Tip | Descriere |
+|---------|-----|-----------|
+| id | Integer | Identificator unic (cheie primară) |
+| nume | String(100) | Denumirea categoriei |
+| descriere | Text | Descrierea categoriei |
 
 ### Tabelul `detalii_facturi`
 
@@ -135,24 +205,6 @@ Liniile individuale de produse din facturi.
 | factura_id | Integer | Legătura cu tabela facturi (cheie străină) |
 | produs_id | Integer | Legătura cu tabela produse (cheie străină) |
 
-### Tabelul `facturi_primite`
-
-Facturile primite de la furnizori.
-
-| Coloană | Tip | Descriere |
-|---------|-----|-----------|
-| id | Integer | Identificator unic (cheie primară) |
-| serie | String(10) | Seria facturii |
-| numar | String(20) | Numărul facturii |
-| data_emitere | Date | Data emiterii facturii |
-| data_scadenta | Date | Data scadenței pentru plată |
-| valoare_totala | Numeric(10,2) | Valoarea totală a facturii (cu TVA) |
-| valoare_tva | Numeric(10,2) | Valoarea TVA-ului |
-| achitata | Boolean | Indicator pentru starea plății |
-| metoda_plata | String(50) | Metoda de plată |
-| observatii | Text | Observații sau note |
-| furnizor_id | Integer | Legătura cu tabela furnizori (cheie străină) |
-
 ### Tabelul `miscari_stoc`
 
 Evidența mișcărilor de stoc (intrări, ieșiri, ajustări).
@@ -166,29 +218,37 @@ Evidența mișcărilor de stoc (intrări, ieșiri, ajustări).
 | motiv | String(255) | Motivul sau descrierea mișcării |
 | produs_id | Integer | Legătura cu tabela produse (cheie străină) |
 | factura_id | Integer | Legătura cu tabela facturi (cheie străină, opțional) |
-| factura_primita_id | Integer | Legătura cu tabela facturi_primite (cheie străină, opțional) |
+| comanda_id | Integer | Legătura cu tabela comenzi (cheie străină, opțional) |
 
 ## Relații între Tabele
 
-Schema bazei de date este organizată cu următoarele relații între tabele:
+Schema bazei de date este organizată cu următoarele relații între tabele, așa cum sunt reprezentate în diagramele anterioare:
 
-1. **Client - Factură**: Relație de tip One-to-Many. Un client poate avea mai multe facturi, dar o factură aparține unui singur client.
+1. **Furnizor - Factură**: Relație de tip One-to-Many (1:M). Un furnizor poate emite mai multe facturi, dar o factură aparține unui singur furnizor.
 
-2. **Furnizor - Factură Primită**: Relație de tip One-to-Many. Un furnizor poate avea mai multe facturi primite, dar o factură primită aparține unui singur furnizor.
+2. **Furnizor - Comandă**: Relație de tip One-to-Many (1:M). Un furnizor poate primi mai multe comenzi, dar o comandă este plasată către un singur furnizor.
 
-3. **Categorie - Produs**: Relație de tip One-to-Many. O categorie poate conține mai multe produse, dar un produs aparține unei singure categorii.
+3. **Comandă - Plată**: Relație de tip One-to-Many (1:M). O comandă poate necesita mai multe plăți, dar o plată aparține unei singure comenzi.
 
-4. **Furnizor - Produs**: Relație de tip One-to-Many. Un furnizor poate oferi mai multe produse, dar un produs este asociat cu un singur furnizor.
+4. **Depozit - Stocuri**: Relație de tip One-to-Many (1:M). Un depozit poate conține mai multe înregistrări de stoc, dar o înregistrare de stoc aparține unui singur depozit.
 
-5. **Factură - Detalii Factură**: Relație de tip One-to-Many. O factură poate conține mai multe linii de detalii, dar o linie de detalii aparține unei singure facturi.
+5. **Produs - Stocuri**: Relație de tip One-to-Many (1:M). Un produs poate exista în stoc în mai multe depozite, dar o înregistrare de stoc se referă la un singur produs.
 
-6. **Produs - Detalii Factură**: Relație de tip One-to-Many. Un produs poate apărea în mai multe linii de detalii, dar o linie de detalii se referă la un singur produs.
+6. **Produs - Produse Comandate**: Relație de tip One-to-Many (1:M). Un produs poate apărea în mai multe comenzi, dar o înregistrare de produs comandat se referă la un singur produs.
 
-7. **Produs - Mișcare Stoc**: Relație de tip One-to-Many. Un produs poate avea mai multe mișcări în stoc, dar o mișcare de stoc se referă la un singur produs.
+7. **Comandă - Produse Comandate**: Relație de tip One-to-Many (1:M). O comandă poate conține mai multe produse, dar o înregistrare de produs comandat aparține unei singure comenzi.
 
-8. **Factură - Mișcare Stoc**: Relație de tip One-to-Many. O factură poate genera mai multe mișcări în stoc, dar o mișcare de stoc poate fi asociată cu o singură factură.
+8. **Categorie - Produs**: Relație de tip One-to-Many (1:M). O categorie poate conține mai multe produse, dar un produs aparține unei singure categorii.
 
-9. **Factură Primită - Mișcare Stoc**: Relație de tip One-to-Many. O factură primită poate genera mai multe mișcări în stoc, dar o mișcare de stoc poate fi asociată cu o singură factură primită.
+9. **Factură - Detalii Factură**: Relație de tip One-to-Many (1:M). O factură poate conține mai multe linii de detalii, dar o linie de detalii aparține unei singure facturi.
+
+10. **Produs - Detalii Factură**: Relație de tip One-to-Many (1:M). Un produs poate apărea în mai multe linii de detalii, dar o linie de detalii se referă la un singur produs.
+
+11. **Produs - Mișcare Stoc**: Relație de tip One-to-Many (1:M). Un produs poate avea mai multe mișcări în stoc, dar o mișcare de stoc se referă la un singur produs.
+
+12. **Factură - Mișcare Stoc**: Relație de tip One-to-Many (1:M). O factură poate genera mai multe mișcări în stoc, dar o mișcare de stoc poate fi asociată cu o singură factură.
+
+13. **Comandă - Mișcare Stoc**: Relație de tip One-to-Many (1:M). O comandă poate genera mai multe mișcări în stoc, dar o mișcare de stoc poate fi asociată cu o singură comandă.
 
 ## Accesarea și Gestionarea Bazei de Date cu pgAdmin
 
