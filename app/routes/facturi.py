@@ -223,38 +223,13 @@ def pdf(id):
     # Create a file-like buffer to receive PDF data
     pdf_buffer = io.BytesIO()
     
-    # Get the absolute path to the css file
-    import os
-    from flask import current_app
-    css_path = os.path.join(current_app.root_path, '..', 'static', 'css', 'pdf_fonts.css')
-    
     # Generate PDF from HTML
     try:
-        # Create link callback function to find resources
-        def link_callback(uri, rel):
-            # Convert URI to absolute system path if it's a local file
-            if uri.startswith('/'):
-                path = os.path.join(current_app.root_path, '..', uri.lstrip('/'))
-                return path
-            # Local static folder
-            elif uri.startswith('../'):
-                path = os.path.join(current_app.root_path, '..', uri.replace('../', ''))
-                return path
-            # Handle the special case for font
-            elif uri.endswith('Roboto-VariableFont.ttf'):
-                return os.path.join(current_app.root_path, '..', 'static', 'font', 'Roboto-VariableFont.ttf')
-            return uri
-            
         # Convert HTML to PDF and write to buffer
-        with open(css_path, 'r') as css_file:
-            css = css_file.read()
-        
         pisa_status = pisa.CreatePDF(
             html,                   # HTML source
             dest=pdf_buffer,        # Output file handle
-            encoding='UTF-8',       # Encoding
-            link_callback=link_callback, # Custom link resolver
-            default_css=css         # Font CSS
+            encoding='UTF-8'        # Encoding
         )
         
         # Rewind the buffer to the beginning

@@ -11,7 +11,7 @@
         }
         
         body {
-            font-family: Roboto, Arial, sans-serif;
+            font-family: Helvetica, Arial, sans-serif;
             font-size: 11pt;
             line-height: 1.5;
             color: #333;
@@ -45,12 +45,13 @@
         .info-section {
             width: 100%;
             margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
+            display: table;
         }
         
         .info-column {
             width: 48%;
+            display: table-cell;
+            vertical-align: top;
         }
         
         .info-title {
@@ -76,12 +77,13 @@
             border: 1px solid #999;
             padding: 15px;
             background-color: #f9f9f9;
-            display: flex;
-            justify-content: space-between;
+            display: table;
+            width: 100%;
         }
         
         .detail-column {
-            width: 30%;
+            width: 33%;
+            display: table-cell;
         }
         
         table {
@@ -131,7 +133,7 @@
             margin-top: 30px;
             margin-bottom: 30px;
             padding: 15px;
-            border: 1px dashed #999;
+            border: 1px solid #999;
             background-color: #f9f9f9;
         }
         
@@ -151,13 +153,13 @@
         
         .signatures {
             margin-top: 70px;
-            display: flex;
-            justify-content: space-between;
+            display: table;
             width: 100%;
         }
         
         .signature-block {
             width: 45%;
+            display: table-cell;
             text-align: center;
         }
         
